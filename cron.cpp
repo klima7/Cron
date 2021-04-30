@@ -1,5 +1,5 @@
-#include "cron.h"
+#include <stdio.h>
 
-void cron::start() {
-
+int main(int argc, char **argv) {
+    return 0;
 }
