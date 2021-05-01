@@ -14,10 +14,10 @@ int main(int argc, char **argv) {
 
     TimeInterval time = TimeInterval::from_string(true, "1 5 3 1");
 
-    // Start server Command
+    // Start Server Command
     if(argc == 1) {
         try {
-            server server;
+            Server server;
             server.start_server();
         } catch(cron_running_exception &e) {
             cout << "Cron is already running" << endl;
@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
     // Operation Command
     else {
         try {
-            client client;
+            Client client;
             string response = client.execute_command(argc, argv);
             cout << response << endl;
         } catch(cron_not_running_exception &e) {
@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void server::start_server() {
+void Server::start_server() {
 
     // Create socket
     int server_sock = socket(AF_INET , SOCK_STREAM , 0);
@@ -78,7 +78,7 @@ void server::start_server() {
     }
 }
 
-void server::handle_connection(int server_sock) {
+void Server::handle_connection(int server_sock) {
 
     // Accept
     sockaddr_in client_addr;
@@ -100,7 +100,7 @@ void server::handle_connection(int server_sock) {
     string command = string(response_buff, res);
 
     // Execute Command
-    string reply = execute_command(command);
+    string reply = interp.interpret(command);
 
     // Send reply
     res = send(client_sock , reply.c_str() , reply.size() , 0);
@@ -114,17 +114,13 @@ void server::handle_connection(int server_sock) {
     close(client_sock);
 }
 
-string server::execute_command(string command) {
-    return "Command added\n";
-}
-
-string client::execute_command(int argc, char **argv) {
+string Client::execute_command(int argc, char **argv) {
     string command = connect_arguments(argc, argv);
     string response = send_to_server(command);
     return response;
 }
 
-string client::connect_arguments(int argc, char **argv) {
+string Client::connect_arguments(int argc, char **argv) {
     stringstream ss;
     for(int i=1; i<argc; i++) {
         ss << argv[i];
@@ -134,7 +130,7 @@ string client::connect_arguments(int argc, char **argv) {
     return ss.str();
 }
 
-string client::send_to_server(string command) {
+string Client::send_to_server(string command) {
 
     // Create socket
     int socket_desc = socket(AF_INET , SOCK_STREAM , 0);

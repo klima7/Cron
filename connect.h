@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include "cron.h"
+#include "interp.h"
 
 #define PORT 6438
 
@@ -10,17 +11,18 @@ class cron_running_exception: public std::exception {};
 
 class cron_not_running_exception: public std::exception {};
 
-class server {
+class Server {
 public:
+    Server(): interp(cron) {};
     void start_server();
 private:
     void handle_connection(int server_sock);
-    std::string execute_command(std::string command);
 
     Cron cron;
+    Interpreter interp;
 };
 
-class client {
+class Client {
 public:
     std::string execute_command(int argc, char **argv);
 private:
