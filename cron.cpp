@@ -15,20 +15,29 @@ int main(int argc, char **argv) {
 
     // Start server command
     if(argc == 1) {
-        int res = start_server();
-        if(res == SERVER_ALREADY_RUNNING_ERROR)
+        try {
+            start_server();
+        } catch(cron_running_exception &e) {
             cout << "Cron is already running" << endl;
-        else if(res == SERVER_ERROR)
-            cout << "Error occured, check logs" << endl;
-        else
-            cout << "Cron started" << endl;
+            return 0;
+        } catch(exception &e) {
+            cout << "Error occured on starting cron, check logs" << endl;
+            return 0;
+        }
+        cout << "Cron started" << endl;
     }
 
     // Operation command
     else {
-        string command = connect_arguments(argc, argv);
-        string response = send_to_server(command);
-        cout << response << endl;
+        try {
+            string command = connect_arguments(argc, argv);
+            string response = send_to_server(command);
+            cout << response << endl;
+        } catch(cron_not_running_exception &e) {
+            cout << "Cron is not running. Start cron first" << endl;
+        } catch(exception &e) {
+            cout << "Error occured while executing command, check logs" << endl;
+        }
     }
 
     return 0;
@@ -49,7 +58,7 @@ string send_to_server(string command) {
     // Create socket
     int socket_desc = socket(AF_INET , SOCK_STREAM , 0);
     if(socket_desc == -1)
-        return "Error occured";
+        throw exception();
 
     // Connect socket
     struct sockaddr_in server = {0};
@@ -59,18 +68,18 @@ string send_to_server(string command) {
 
     int res = connect(socket_desc ,(struct sockaddr *)&server , sizeof(server));
     if (res < 0)
-        return "Cron is not running. Start cron first";
+        throw cron_not_running_exception();
 
     // Send command
     res = send(socket_desc , command.c_str() , command.size() , 0);
     if(res < 0)
-        return "Cron is not running";
+        throw exception();
 
     // Receive response
     char response_buff[2000];
     res = recv(socket_desc, response_buff , 2000 , 0);
     if(res < 0)
-        return "Error occured";
+        throw exception();
 
     // Display response
     return string(response_buff, res);
