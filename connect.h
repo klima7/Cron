@@ -2,6 +2,7 @@
 #define CRON_CONNECT_H
 
 #include <stdexcept>
+#include "cron.h"
 
 #define PORT 6438
 
@@ -15,6 +16,8 @@ public:
 private:
     void handle_connection(int server_sock);
     std::string execute_command(std::string command);
+
+    Cron cron;
 };
 
 class client {

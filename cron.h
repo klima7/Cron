@@ -2,7 +2,8 @@
 #define CRON_CRON_H
 
 
-class cron {
+class Cron {
+public:
 
 };
 

@@ -1,4 +1,5 @@
 #include "connect.h"
+#include "time.h"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -11,7 +12,9 @@ using namespace std;
 
 int main(int argc, char **argv) {
 
-    // Start server command
+    TimeInterval time = TimeInterval::from_string(true, "1 5 3 1");
+
+    // Start server Command
     if(argc == 1) {
         try {
             server server;
@@ -20,22 +23,22 @@ int main(int argc, char **argv) {
             cout << "Cron is already running" << endl;
             return 0;
         } catch(exception &e) {
-            cout << "Error occured on starting cron, check logs" << endl;
+            cout << "Error occured on starting Cron, check logs" << endl;
             return 0;
         }
         cout << "Cron started" << endl;
     }
 
-    // Operation command
+    // Operation Command
     else {
         try {
             client client;
             string response = client.execute_command(argc, argv);
             cout << response << endl;
         } catch(cron_not_running_exception &e) {
-            cout << "Cron is not running. Start cron first" << endl;
+            cout << "Cron is not running. Start Cron first" << endl;
         } catch(exception &e) {
-            cout << "Error occured while executing command, check logs" << endl;
+            cout << "Error occured while executing Command, check logs" << endl;
         }
     }
 
@@ -86,17 +89,17 @@ void server::handle_connection(int server_sock) {
         return;
     }
 
-    // Read command
+    // Read Command
     char response_buff[2000];
     int res = recv(client_sock, response_buff , 2000 , 0);
     if(res < 0) {
-        cout << "Error occured on reading command" << endl;
+        cout << "Error occured on reading Command" << endl;
         close(client_sock);
         return;
     }
     string command = string(response_buff, res);
 
-    // Execute command
+    // Execute Command
     string reply = execute_command(command);
 
     // Send reply
@@ -148,7 +151,7 @@ string client::send_to_server(string command) {
     if (res < 0)
         throw cron_not_running_exception();
 
-    // Send command
+    // Send Command
     res = send(socket_desc , command.c_str() , command.size() , 0);
     if(res < 0)
         throw exception();
