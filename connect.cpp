@@ -1,8 +1,6 @@
 #include "connect.h"
-#include "time.h"
 #include <iostream>
 #include <string>
-#include <sstream>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -11,8 +9,6 @@ using namespace std;
 
 
 int main(int argc, char **argv) {
-
-    TimeInterval time = TimeInterval::from_string(true, "1 5 3 1");
 
     // Start Server Command
     if(argc == 1) {

@@ -19,7 +19,7 @@ TimeInterval TimeInterval::from_absolute(int second, int minute, int hour, int d
 TimeInterval TimeInterval::from_string(bool relative, string str_time) {
     int numbers[4];
     
-    list<string> tokens = get_tokens(str_time, " ");
+    list<string> tokens = get_tokens(str_time, ".");
     if(tokens.size() != 4)
         throw exception();
 

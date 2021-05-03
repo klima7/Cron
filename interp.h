@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 #include "cron.h"
 #include "task.h"
 
@@ -13,9 +14,10 @@ public:
     std::string interpret(std::string command);
 private:
     static std::vector<std::string> get_tokens(std::string text, std::string delimiter);
-    std::string list_command();
-    std::string remove_command(std::vector<std::string> arguments);
-    std::string add_command(std::vector<std::string> arguments);
+    void list_command(std::stringstream &out);
+    void remove_command(std::vector<std::string> arguments, std::stringstream &out);
+    void add_command(std::vector<std::string> arguments, std::stringstream &out);
+    void exit_command(std::stringstream &out);
     Cron cron;
 };
 

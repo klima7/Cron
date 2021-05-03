@@ -1,5 +1,7 @@
 #include "interp.h"
+#include "time.h"
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
@@ -14,18 +16,23 @@ string Interpreter::interpret(std::string command) {
     string cmd = tokens[0];
     vector<string> args = vector<string>(tokens.begin()+1, tokens.end());
 
+    stringstream stream;
+
     if(tokens[0] == "add") {
-        return add_command(args);
+        add_command(args, stream);
+        return stream.str();
     }
     else if(tokens[0] == "remove") {
-        return remove_command(args);
+        remove_command(args, stream);
+        return stream.str();
     }
     else if(tokens[0] == "exit") {
-        cron.exit();
-        return "Cron exited";
+        exit_command(stream);
+        return stream.str();
     }
     else if(tokens[0] == "list") {
-        return list_command();
+        list_command(stream);
+        return stream.str();
     }
     else {
         return "Invalid command";
@@ -47,7 +54,7 @@ vector<string> Interpreter::get_tokens(string text, string delimiter) {
     return tokens;
 }
 
-string Interpreter::add_command(vector<string> arguments) {
+void Interpreter::add_command(vector<string> arguments, stringstream &out) {
     int next = 0;
     bool relative = false;
 
@@ -56,16 +63,23 @@ string Interpreter::add_command(vector<string> arguments) {
         next++;
     }
 
+    cout << arguments[next] << endl;
+    string base_time = arguments[next++];
 
-
-    return "add command";
+    TimeInterval time_to_start = TimeInterval::from_string(relative, base_time);
+    out << time_to_start.to_seconds();
 }
 
-string Interpreter::remove_command(vector<string> arguments) {
-    return "remove command";
+void Interpreter::remove_command(vector<string> arguments, stringstream &out) {
+    out << "remove command";
 }
 
-string Interpreter::list_command() {
+void Interpreter::list_command(stringstream &out) {
     list<Task> tasks = cron.get_tasks();
-    return "list command";
+    out << "list command";
+}
+
+void Interpreter::exit_command(stringstream &out) {
+    cron.exit();
+    out << "exit command";
 }
