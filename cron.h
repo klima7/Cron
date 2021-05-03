@@ -6,10 +6,11 @@
 #include "task.h"
 
 class Cron {
+public:
     void add_task(Task task);
     void remove_task(int task_id);
-    void exit();
     std::list<Task> get_tasks();
+    void exit();
 };
 
 

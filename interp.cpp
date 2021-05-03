@@ -1,4 +1,5 @@
 #include "interp.h"
+#include <vector>
 
 using namespace std;
 
@@ -10,17 +11,21 @@ string Interpreter::interpret(std::string command) {
 
     vector<string> tokens = get_tokens(command, " ");
 
+    string cmd = tokens[0];
+    vector<string> args = vector<string>(tokens.begin()+1, tokens.end());
+
     if(tokens[0] == "add") {
-        return "Task added";
+        return add_command(args);
     }
     else if(tokens[0] == "remove") {
-        return "Task removed";
+        return remove_command(args);
     }
     else if(tokens[0] == "exit") {
+        cron.exit();
         return "Cron exited";
     }
     else if(tokens[0] == "list") {
-        return "Listing tasks";
+        return list_command();
     }
     else {
         return "Invalid command";
@@ -40,4 +45,27 @@ vector<string> Interpreter::get_tokens(string text, string delimiter) {
     tokens.push_back(text);
 
     return tokens;
+}
+
+string Interpreter::add_command(vector<string> arguments) {
+    int next = 0;
+    bool relative = false;
+
+    if(arguments[next] == "-r") {
+        relative = true;
+        next++;
+    }
+
+
+
+    return "add command";
+}
+
+string Interpreter::remove_command(vector<string> arguments) {
+    return "remove command";
+}
+
+string Interpreter::list_command() {
+    list<Task> tasks = cron.get_tasks();
+    return "list command";
 }
