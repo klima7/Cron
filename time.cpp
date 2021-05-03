@@ -30,11 +30,16 @@ TimeInterval TimeInterval::from_string(bool relative, string str_time) {
     
     list<string> tokens = get_tokens(str_time, ".");
     if(tokens.size() != 6)
-        throw exception();
+        throw InvalidTimeException();
 
     int index = 0;
     for(string token : tokens) {
-        numbers[index] = stoi(token);
+        if(token.length() == 0)
+            throw InvalidTimeException();
+        size_t read_chars;
+        numbers[index] = stoi(token, &read_chars);
+        if(read_chars != tokens.size())
+            throw InvalidTimeException();
         index++;
     }
 

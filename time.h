@@ -5,6 +5,10 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <stdexcept>
+
+
+class InvalidTimeException: public std::exception {};
 
 
 class TimeInterval {
