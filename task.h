@@ -10,6 +10,7 @@ public:
     Task(std::string cmd, std::vector<std::string> args, TimeInterval base_time);
     Task(std::string cmd, std::vector<std::string> args, TimeInterval base_time, TimeInterval repeat_time);
     void run();
+    void schedule();
 private:
     static int next_id;
     int id;
