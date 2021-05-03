@@ -4,7 +4,7 @@
 using namespace std;
 
 void Cron::add_task(Task task) {
-
+    cout << "Task added" << endl;
 }
 
 void Cron::remove_task(int task_id) {

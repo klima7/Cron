@@ -56,33 +56,61 @@ vector<string> Interpreter::get_tokens(string text, string delimiter) {
 
 void Interpreter::add_command(vector<string> arguments, stringstream &out) {
     try {
-        int next = 0;
+        auto iter = arguments.begin();
+
         bool relative = false;
+        bool cyclic = false;
 
         if(arguments.empty())
             throw ArgumentsException();
 
-        if (arguments[next] == "-r") {
+        if (*iter == "-r") {
             relative = true;
-            next++;
+            iter++;
         }
 
-        if(arguments.size() - next == 0)
+        if(iter == arguments.end())
             throw ArgumentsException();
 
-        string base_time = arguments[next++];
-        TimeInterval time_to_start = TimeInterval::from_string(relative, base_time);
-        out << time_to_start.to_seconds() << endl;
+        string base_time_str = *iter++;
 
-        if(arguments.size() - next > 0) {
-            string repeat_time_str = arguments[next++];
-            TimeInterval repeat_time = TimeInterval::from_string(true, repeat_time_str);
-            out << repeat_time.to_seconds() << endl;
+        if(iter == arguments.end())
+            throw ArgumentsException();
+
+        string repeat_time_str;
+        if (*iter == "-c") {
+            iter++;
+            if(iter == arguments.end())
+                throw ArgumentsException();
+            repeat_time_str = *iter++;
         }
+
+        if(iter == arguments.end())
+            throw ArgumentsException();
+
+        string cmd = *iter++;
+        vector<string> cmd_arguments = vector<string>(iter, arguments.end());
+
+        // Create task
+        TimeInterval base_time = TimeInterval::from_string(relative, base_time_str);
+        if(repeat_time_str.length() == 0) {
+            Task task(cmd, cmd_arguments, base_time);
+            cron.add_task(task);
+        }
+        else {
+            TimeInterval repeat_time = TimeInterval::from_string(relative, repeat_time_str);
+            Task task(cmd, cmd_arguments, base_time);
+            cron.add_task(task);
+        }
+
+        out << "Task added" << endl;
     }
     catch(ArgumentsException &e) {
         out << "Invalid arguments" << endl;
-        out << "Proper usage: cron add [-r] s.m.h.d.m.y [s.m.h.d.m.y]" << endl;
+        out << "Proper usage: cron add [-r] s.m.h.d.m.y [s.m.h.d.m.y] command [arguments...]" << endl;
+    }
+    catch(InvalidTimeException &e) {
+        out << "Invalid time format" << endl;
     }
 }
 
