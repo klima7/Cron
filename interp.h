@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <stdexcept>
 #include "cron.h"
 #include "task.h"
 
@@ -13,6 +14,7 @@ public:
     Interpreter(Cron cron);
     std::string interpret(std::string command);
 private:
+    class ArgumentsException: public std::exception {};
     static std::vector<std::string> get_tokens(std::string text, std::string delimiter);
     void list_command(std::stringstream &out);
     void remove_command(std::vector<std::string> arguments, std::stringstream &out);

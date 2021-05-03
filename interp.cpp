@@ -55,19 +55,35 @@ vector<string> Interpreter::get_tokens(string text, string delimiter) {
 }
 
 void Interpreter::add_command(vector<string> arguments, stringstream &out) {
-    int next = 0;
-    bool relative = false;
+    try {
+        int next = 0;
+        bool relative = false;
 
-    if(arguments[next] == "-r") {
-        relative = true;
-        next++;
+        if(arguments.empty())
+            throw ArgumentsException();
+
+        if (arguments[next] == "-r") {
+            relative = true;
+            next++;
+        }
+
+        if(arguments.size() - next == 0)
+            throw ArgumentsException();
+
+        string base_time = arguments[next++];
+        TimeInterval time_to_start = TimeInterval::from_string(relative, base_time);
+        out << time_to_start.to_seconds() << endl;
+
+        if(arguments.size() - next > 0) {
+            string repeat_time_str = arguments[next++];
+            TimeInterval repeat_time = TimeInterval::from_string(true, repeat_time_str);
+            out << repeat_time.to_seconds() << endl;
+        }
     }
-
-    cout << arguments[next] << endl;
-    string base_time = arguments[next++];
-
-    TimeInterval time_to_start = TimeInterval::from_string(relative, base_time);
-    out << time_to_start.to_seconds();
+    catch(ArgumentsException &e) {
+        out << "Invalid arguments" << endl;
+        out << "Proper usage: cron add [-r] s.m.h.d.m.y [s.m.h.d.m.y]" << endl;
+    }
 }
 
 void Interpreter::remove_command(vector<string> arguments, stringstream &out) {
