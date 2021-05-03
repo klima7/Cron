@@ -38,7 +38,7 @@ TimeInterval TimeInterval::from_string(bool relative, string str_time) {
             throw InvalidTimeException();
         size_t read_chars;
         numbers[index] = stoi(token, &read_chars);
-        if(read_chars != tokens.size())
+        if(read_chars != token.length())
             throw InvalidTimeException();
         index++;
     }
