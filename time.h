@@ -13,8 +13,8 @@ public:
     long to_seconds();
 private:
     TimeInterval(long seconds): seconds(seconds) {};
-    static TimeInterval from_relative(int second, int minute, int hour, int day);
-    static TimeInterval from_absolute(int second, int minute, int hour, int day);
+    static TimeInterval from_relative(int second, int minute, int hour, int day, int month, int year);
+    static TimeInterval from_absolute(int second, int minute, int hour, int day, int month, int year);
     static std::list<std::string> get_tokens(std::string text, std::string delimiter);
     long seconds;
 };

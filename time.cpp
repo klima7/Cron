@@ -4,23 +4,32 @@
 
 using namespace std;
 
-TimeInterval TimeInterval::from_relative(int second, int minute, int hour, int day) {
-    long seconds = second + minute*60 + hour*3600 + day*3600*24;
+TimeInterval TimeInterval::from_relative(int second, int minute, int hour, int day, int month, int year) {
+    long seconds = second + minute*60 + hour*3600 + day*3600*24 + month * 3600 * 34 * 30 + year * 3600 * 34 * 30 * 365;
     return TimeInterval(seconds);
 }
 
-TimeInterval TimeInterval::from_absolute(int second, int minute, int hour, int day) {
+TimeInterval TimeInterval::from_absolute(int second, int minute, int hour, int day, int month, int year) {
     time_t curr_time = time(NULL);
-    time_t that_time = second + minute * 60 + hour * 3600 + day * 3600 * 24;
+
+    struct tm time = {};
+    time.tm_sec = second;
+    time.tm_min = minute;
+    time.tm_hour = hour;
+    time.tm_mday = day;
+    time.tm_mon = month;
+    time.tm_year = year;
+    time_t that_time = mktime(&time);
+
     long diff = difftime(that_time, curr_time);
     return TimeInterval(diff);
 }
 
 TimeInterval TimeInterval::from_string(bool relative, string str_time) {
-    int numbers[4];
+    int numbers[6];
     
     list<string> tokens = get_tokens(str_time, ".");
-    if(tokens.size() != 4)
+    if(tokens.size() != 6)
         throw exception();
 
     int index = 0;
@@ -30,9 +39,9 @@ TimeInterval TimeInterval::from_string(bool relative, string str_time) {
     }
 
     if(relative)
-        return from_relative(numbers[0], numbers[1], numbers[2], numbers[3]);
+        return from_relative(numbers[0], numbers[1], numbers[2], numbers[3], numbers[4], numbers[5]);
     else
-        return from_absolute(numbers[0], numbers[1], numbers[2], numbers[3]);
+        return from_absolute(numbers[0], numbers[1], numbers[2], numbers[3], numbers[4], numbers[5]);
 }
 
 list<string> TimeInterval::get_tokens(string text, string delimiter) {
