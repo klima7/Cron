@@ -14,7 +14,8 @@ class InvalidTimeException: public std::exception {};
 class Time {
     friend std::ostream& operator<<(std::ostream &os, const Time &time);
 public:
-    Time(std::string str_time);
+    Time(std::string str_time="0.0.0.0.0.0");
+    Time add(const Time &other);
     long to_seconds();
 private:
     static std::list<std::string> get_tokens(std::string text, std::string delimiter);
