@@ -7,8 +7,8 @@
 
 class Task {
 public:
-    Task(std::string cmd, std::vector<std::string> args, TimeInterval base_time);
-    Task(std::string cmd, std::vector<std::string> args, TimeInterval base_time, TimeInterval repeat_time);
+    Task(std::string cmd, std::vector<std::string> args, Time base_time);
+    Task(std::string cmd, std::vector<std::string> args, Time base_time, Time repeat_time);
     void run();
     void schedule();
 private:
@@ -18,8 +18,8 @@ private:
 
     std::string command;
     std::vector<std::string> args;
-    TimeInterval base_time;
-    TimeInterval repeat_time;
+    Time base_time;
+    Time repeat_time;
 };
 
 #endif

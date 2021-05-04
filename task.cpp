@@ -10,7 +10,7 @@ void fun(__sigval_t arg);
 
 int Task::next_id = 1;
 
-Task::Task(string command, vector<string> args, TimeInterval time): id(next_id++), base_time(time), repeat_time(time) {
+Task::Task(string command, vector<string> args, Time time): id(next_id++), base_time(time), repeat_time(time) {
     this->command = command;
     this->args = args;
     cyclic = false;
@@ -34,13 +34,14 @@ void Task::schedule() {
     event.sigev_value.sival_ptr = this;
 
     timer_t timer;
-    int res = timer_create(CLOCK_MONOTONIC, &event, &timer);
+    int res = timer_create(CLOCK_REALTIME, &event, &timer);
     assert(res == 0);
 
     struct itimerspec timespec = {0};
-    timespec.it_value.tv_sec = 2;
+    timespec.it_value.tv_sec = time(NULL);
+    timespec.it_value.tv_sec += 3;
 
-    res = timer_settime(timer, 0, &timespec, NULL);
+    res = timer_settime(timer, TIMER_ABSTIME, &timespec, NULL);
     cout << "res: " << res << endl;
 }
 

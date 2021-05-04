@@ -4,28 +4,7 @@
 
 using namespace std;
 
-TimeInterval TimeInterval::from_relative(int second, int minute, int hour, int day, int month, int year) {
-    long seconds = second + minute*60 + hour*3600 + day*3600*24 + month * 3600 * 34 * 30 + year * 3600 * 34 * 30 * 365;
-    return TimeInterval(seconds);
-}
-
-TimeInterval TimeInterval::from_absolute(int second, int minute, int hour, int day, int month, int year) {
-    time_t curr_time = time(NULL);
-
-    struct tm time = {};
-    time.tm_sec = second;
-    time.tm_min = minute;
-    time.tm_hour = hour;
-    time.tm_mday = day;
-    time.tm_mon = month;
-    time.tm_year = year;
-    time_t that_time = mktime(&time);
-
-    long diff = difftime(that_time, curr_time);
-    return TimeInterval(diff);
-}
-
-TimeInterval TimeInterval::from_string(bool relative, string str_time) {
+Time::Time(string str_time) {
     int numbers[6];
     
     list<string> tokens = get_tokens(str_time, ".");
@@ -43,13 +22,15 @@ TimeInterval TimeInterval::from_string(bool relative, string str_time) {
         index++;
     }
 
-    if(relative)
-        return from_relative(numbers[0], numbers[1], numbers[2], numbers[3], numbers[4], numbers[5]);
-    else
-        return from_absolute(numbers[0], numbers[1], numbers[2], numbers[3], numbers[4], numbers[5]);
+    second = numbers[0];
+    minute = numbers[1];
+    hour = numbers[2];
+    day = numbers[3];
+    month = numbers[4];
+    year = numbers[5];
 }
 
-list<string> TimeInterval::get_tokens(string text, string delimiter) {
+list<string> Time::get_tokens(string text, string delimiter) {
     list<string> tokens;
     size_t pos = 0;
     string token;
@@ -64,6 +45,11 @@ list<string> TimeInterval::get_tokens(string text, string delimiter) {
     return tokens;
 }
 
-long TimeInterval::to_seconds() {
-    return seconds;
+long Time::to_seconds() {
+    return second + minute*60 + hour*3600 + day*3600*24 + month*3600*24*30 + year*3600*24*30*365;
+}
+
+std::ostream& operator<<(std::ostream &os, const Time &time) {
+    os << time.second << "." << time.minute << "." << time.hour << "." << time.day << "." << time.month << "." << time.year;
+    return os;
 }
