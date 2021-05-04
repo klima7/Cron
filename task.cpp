@@ -42,8 +42,7 @@ void AbsTask::schedule() {
     assert(res == 0);
 
     struct itimerspec timespec = {0};
-    timespec.it_value.tv_sec = time(NULL);
-    timespec.it_value.tv_sec += 3;
+    timespec.it_value.tv_sec = base_time->get_seconds_since_1970();
 
     res = timer_settime(timer, TIMER_ABSTIME, &timespec, NULL);
     assert(res == 0);

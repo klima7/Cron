@@ -16,7 +16,8 @@ class Time {
 public:
     Time(std::string str_time="0.0.0.0.0.0");
     Time add(const Time &other);
-    long to_seconds();
+    long get_seconds();
+    long get_seconds_since_1970();
 private:
     static std::list<std::string> get_tokens(std::string text, std::string delimiter);
     int second, minute, hour, day, month, year;

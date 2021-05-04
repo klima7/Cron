@@ -45,8 +45,24 @@ list<string> Time::get_tokens(string text, string delimiter) {
     return tokens;
 }
 
-long Time::to_seconds() {
+long Time::get_seconds() {
     return second + minute*60 + hour*3600 + day*3600*24 + month*3600*24*30 + year*3600*24*30*365;
+}
+
+long Time::get_seconds_since_1970() {
+    time_t t1 = time(NULL);
+    struct tm *t2 = localtime(&t1);
+    int daylight_saving = t2->tm_isdst;
+
+    struct tm cal = {0};
+    cal.tm_sec = second;
+    cal.tm_min = minute;
+    cal.tm_hour = hour;
+    cal.tm_mday = day;
+    cal.tm_mon = month - 1;
+    cal.tm_year = year - 1900;
+    cal.tm_isdst = daylight_saving;
+    return mktime(&cal);
 }
 
 std::ostream& operator<<(std::ostream &os, const Time &time) {
