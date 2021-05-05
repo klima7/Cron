@@ -59,11 +59,11 @@ void Interpreter::add_command(vector<string> arguments, stringstream &out) {
         auto iter = arguments.begin();
 
         bool relative = false;
-        bool cyclic = false;
 
         if(arguments.empty())
             throw ArgumentsException();
 
+        // Check if relative
         if (*iter == "-r") {
             relative = true;
             iter++;
@@ -72,35 +72,30 @@ void Interpreter::add_command(vector<string> arguments, stringstream &out) {
         if(iter == arguments.end())
             throw ArgumentsException();
 
-        string base_time_str = *iter++;
+        // Get base time
+        Time base_time = Time(relative, *iter++);
 
         if(iter == arguments.end())
             throw ArgumentsException();
 
-        string repeat_time_str;
+        // Get repeat time if present
+        Time repeat_time;
         if (*iter == "-c") {
             iter++;
             if(iter == arguments.end())
                 throw ArgumentsException();
-            repeat_time_str = *iter++;
+            repeat_time = Time(true, *iter++);
         }
 
         if(iter == arguments.end())
             throw ArgumentsException();
 
+        // Get command and arguments
         string cmd = *iter++;
         vector<string> cmd_arguments = vector<string>(iter, arguments.end());
 
-        // Create task
-        Time *base_time = new Time(base_time_str);
-        if(repeat_time_str.length() == 0) {
-            cron.add_task(cmd, cmd_arguments, base_time);
-        }
-        else {
-            Time *repeat_time = new Time(repeat_time_str);
-            cron.add_task(cmd, cmd_arguments, base_time, repeat_time);
-        }
-
+        // Call cron
+        cron.add_task(cmd, cmd_arguments, base_time, repeat_time);
         out << "Task added" << endl;
     }
     catch(ArgumentsException &e) {

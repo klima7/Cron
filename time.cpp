@@ -22,7 +22,7 @@ Time::Time(bool relative, string str_time) {
         index++;
     }
 
-    relative = relative;
+    this->relative = relative;
     second = numbers[0];
     minute = numbers[1];
     hour = numbers[2];

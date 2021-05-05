@@ -8,10 +8,16 @@ using namespace std;
 
 int Task::next_id = 1;
 
-Task::Task(std::string command, std::vector<std::string> args) {
+Task::Task(std::string command, std::vector<std::string> args, Time base_time, Time repeat_time) {
     this->command = command;
     this->args = args;
     this->id = next_id++;
+    this->base_time = base_time;
+    this->repeat_time = repeat_time;
+}
+
+int Task::get_id() {
+    return id;
 }
 
 void Task::run() {
@@ -23,66 +29,38 @@ void Task::run() {
     posix_spawn(&child_pid, command.c_str(), NULL, NULL, arg_list, NULL);
 }
 
-SchedTask::SchedTask(std::string command, std::vector<std::string> args, Time *base_time, Time *repeat_time): Task(command, args) {
-    this->base_time = base_time;
-    this->repeat_time = repeat_time;
-}
-
-void SchedTask::cancel() {
+void Task::cancel() {
     timer_delete(timer);
 }
 
-void AbsTask::schedule() {
+void Task::schedule() {
     struct sigevent event = {0};
     event.sigev_notify = SIGEV_THREAD;
-    event.sigev_notify_function = AbsTask::callback;
+    event.sigev_notify_function = Task::callback;
     event.sigev_value.sival_ptr = this;
 
     int res = timer_create(CLOCK_REALTIME, &event, &timer);
     assert(res == 0);
 
     struct itimerspec timespec = {0};
-    timespec.it_value.tv_sec = base_time->get_seconds_since_1970();
+    timespec.it_value.tv_sec = base_time.get_seconds();
+    timespec.it_interval.tv_sec = repeat_time.get_seconds();
 
-    long diff = base_time->get_seconds_since_1970() - time(NULL);
+    long diff = timespec.it_value.tv_sec - time(NULL);
     cout << "Diff=" << diff << endl;
 
-    res = timer_settime(timer, TIMER_ABSTIME, &timespec, NULL);
-    assert(res == 0);
-}
-
-void AbsTask::callback(__sigval_t arg) {
-    AbsTask *task = (AbsTask*)arg.sival_ptr;
-    cout << "Starting task 1" << endl;
-    task->run();
-    if(task->repeat_time != NULL) {
-        cout << "here 1" << endl;
-        cout << *task->repeat_time << endl;
-        task->base_time = task->base_time->add(*task->repeat_time);
-        task->schedule();
+    if(base_time.is_relative()) {
+        cout << "relative" << endl;
     }
-}
-
-void RelTask::schedule() {
-    struct sigevent event = {0};
-    event.sigev_notify = SIGEV_THREAD;
-    event.sigev_notify_function = RelTask::callback;
-    event.sigev_value.sival_ptr = this;
-
-    timer_t timer;
-    int res = timer_create(CLOCK_REALTIME, &event, &timer);
+    else {
+        cout << "absolute" << endl;
+    }
+    res = timer_settime(timer, base_time.is_relative() ? 0 : TIMER_ABSTIME, &timespec, NULL);
     assert(res == 0);
-
-    struct itimerspec timespec = {0};
-    timespec.it_value.tv_sec = time(NULL);
-    timespec.it_value.tv_sec += 3;
-
-    res = timer_settime(timer, TIMER_ABSTIME, &timespec, NULL);
-    cout << "res: " << res << endl;
 }
 
-void RelTask::callback(__sigval_t arg) {
-    RelTask *task = (RelTask*)arg.sival_ptr;
+void Task::callback(__sigval_t arg) {
+    Task *task = (Task*)arg.sival_ptr;
     cout << "Starting task" << endl;
     task->run();
 }

@@ -9,8 +9,11 @@
 
 class Task {
 public:
-    Task(std::string command, std::vector<std::string> args);
+    Task(std::string command, std::vector<std::string> args, Time base_time, Time repeat_time);
+    int get_id();
     void run();
+    void schedule();
+    void cancel();
 
 private:
     static int next_id;
@@ -18,34 +21,11 @@ private:
 
     std::string command;
     std::vector<std::string> args;
-};
 
-
-class SchedTask: public Task {
-public:
-    SchedTask(std::string command, std::vector<std::string> args, Time *base_time, Time *repeat_time=NULL);
-    virtual void schedule()=0;
-    void cancel();
-protected:
     timer_t timer;
-    Time *base_time;
-    Time *repeat_time;
-};
+    Time base_time;
+    Time repeat_time;
 
-
-class AbsTask: public SchedTask {
-public:
-    AbsTask(std::string command, std::vector<std::string> args, Time *base_time, Time *repeat_time=NULL): SchedTask(command, args, base_time, repeat_time) {};
-    void schedule() override;
-private:
-    static void callback(__sigval_t arg);
-};
-
-
-class RelTask: public SchedTask {
-public:
-    void schedule() override;
-private:
     static void callback(__sigval_t arg);
 };
 
