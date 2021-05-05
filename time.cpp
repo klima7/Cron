@@ -1,5 +1,7 @@
 #include "time.h"
+#include "util.h"
 #include <string>
+#include <vector>
 #include <ctime>
 
 using namespace std;
@@ -7,7 +9,7 @@ using namespace std;
 Time::Time(bool relative, string str_time) {
     int numbers[6];
     
-    list<string> tokens = get_tokens(str_time, ".");
+    vector<string> tokens = tokenize(str_time, ".");
     if(tokens.size() != 6)
         throw InvalidTimeException();
 
@@ -39,21 +41,6 @@ Time::Time(bool relative, int second, int minute, int hour, int day, int month, 
     this->day = day;
     this->month = month;
     this->year = year;
-}
-
-list<string> Time::get_tokens(string text, string delimiter) {
-    list<string> tokens;
-    size_t pos = 0;
-    string token;
-
-    while ((pos = text.find(delimiter)) != string::npos) {
-        token = text.substr(0, pos);
-        tokens.push_back(token);
-        text.erase(0, pos + delimiter.length());
-    }
-    tokens.push_back(text);
-
-    return tokens;
 }
 
 bool Time::is_relative() const {

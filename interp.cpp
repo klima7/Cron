@@ -1,5 +1,6 @@
 #include "interp.h"
 #include "time.h"
+#include "util.h"
 #include <vector>
 #include <sstream>
 
@@ -9,7 +10,7 @@ Interpreter::Interpreter(Cron &cron): cron(cron) { }
 
 string Interpreter::interpret(std::string command) {
 
-    vector<string> tokens = get_tokens(command, " ");
+    vector<string> tokens = tokenize(command, " ");
 
     string cmd = tokens[0];
     vector<string> args = vector<string>(tokens.begin()+1, tokens.end());
@@ -35,21 +36,6 @@ string Interpreter::interpret(std::string command) {
     else {
         return "Invalid command";
     }
-}
-
-vector<string> Interpreter::get_tokens(string text, string delimiter) {
-    vector<string> tokens;
-    size_t pos = 0;
-    string token;
-
-    while ((pos = text.find(delimiter)) != string::npos) {
-        token = text.substr(0, pos);
-        tokens.push_back(token);
-        text.erase(0, pos + delimiter.length());
-    }
-    tokens.push_back(text);
-
-    return tokens;
 }
 
 void Interpreter::add_command(vector<string> arguments, stringstream &out) {

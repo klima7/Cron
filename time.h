@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <string>
-#include <list>
 #include <stdexcept>
 
 
@@ -21,7 +20,6 @@ public:
     long get_relative_seconds() const;
     long get_absolute_seconds() const;
 private:
-    static std::list<std::string> get_tokens(std::string text, std::string delimiter);
     bool relative;
     int second, minute, hour, day, month, year;
 };
