@@ -21,7 +21,7 @@ void Cron::remove_task(int task_id) {
     }
 }
 
-std::list<Task> Cron::get_tasks() {
+std::list<Task> Cron::get_tasks() const {
     list<Task> active_tasks;
     for(Task *task : tasks) {
         if(task->is_active())
@@ -44,7 +44,7 @@ int Cron::exit() {
     return count;
 }
 
-bool Cron::is_exited() {
+bool Cron::is_exited() const {
     return exited;
 }
 

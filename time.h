@@ -16,10 +16,10 @@ class Time {
 public:
     Time(bool relative=true, std::string str_time="0.0.0.0.0.0");
     Time(bool relative, int second, int minute, int hour, int day, int month, int year);
-    bool is_relative();
+    bool is_relative() const;
     long get_seconds();
-    long get_relative_seconds();
-    long get_absolute_seconds();
+    long get_relative_seconds() const;
+    long get_absolute_seconds() const;
 private:
     static std::list<std::string> get_tokens(std::string text, std::string delimiter);
     bool relative;

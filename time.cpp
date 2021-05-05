@@ -56,7 +56,7 @@ list<string> Time::get_tokens(string text, string delimiter) {
     return tokens;
 }
 
-bool Time::is_relative() {
+bool Time::is_relative() const {
     return relative;
 }
 
@@ -65,11 +65,11 @@ long Time::get_seconds() {
     else return get_absolute_seconds();
 }
 
-long Time::get_relative_seconds() {
+long Time::get_relative_seconds() const {
     return second + minute*60 + hour*3600 + day*3600*24 + month*3600*24*30 + year*3600*24*30*365;
 }
 
-long Time::get_absolute_seconds() {
+long Time::get_absolute_seconds() const {
     time_t t1 = time(NULL);
     struct tm *t2 = localtime(&t1);
     int daylight_saving = t2->tm_isdst;
