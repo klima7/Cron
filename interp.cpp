@@ -101,7 +101,7 @@ void Interpreter::add_command(vector<string> arguments, stringstream &out) {
         out << "Proper usage: cron add [-r] <s.m.h.d.m.y> [-c s.m.h.d.m.y] <command> [arguments...]" << endl;
     }
     catch(InvalidTimeException &e) {
-        out << "Invalid time format" << endl;
+        out << "Error: Invalid time format" << endl;
     }
 }
 
@@ -110,10 +110,20 @@ void Interpreter::remove_command(vector<string> arguments, stringstream &out) {
         if(arguments.size() != 1)
             throw ArgumentsException();
 
-        int id = stoi(arguments[0]);
+        int id = 0;
+        try {
+            id = stoi(arguments[0]);
+        }
+        catch(invalid_argument&) {
+            out << "Error: Provided id is not a number" << endl;
+            return;
+        }
 
-        cron.remove_task(id);
-        out << "Task with id " << id << " removed" << endl;
+        bool success = cron.remove_task(id);
+        if(success)
+            out << "Task with id " << id << " removed" << endl;
+        else
+            out << "Error: Unable to find task with given id " << endl;
     }
     catch(ArgumentsException &e) {
         out << "Invalid arguments" << endl;

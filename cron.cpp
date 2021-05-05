@@ -11,14 +11,15 @@ void Cron::add_task(string path, vector<string> args, Time base_time, Time repea
     task->schedule();
 }
 
-void Cron::remove_task(int task_id) {
-    for(list<Task*>::iterator iter=tasks.begin(); iter != tasks.end(); iter++) {
+bool Cron::remove_task(int task_id) {
+    for(auto iter=tasks.begin(); iter != tasks.end(); iter++) {
         Task *task = *iter;
-        if(task->get_id() == task_id) {
+        if(task->is_active() && task->get_id() == task_id) {
             task->cancel();
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 std::list<Task> Cron::get_tasks() const {

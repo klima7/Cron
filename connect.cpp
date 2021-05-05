@@ -16,10 +16,10 @@ int main(int argc, char **argv) {
             Server server;
             server.start_server();
         } catch(cron_running_exception &e) {
-            cout << "Cron is already running" << endl;
+            cout << "Error: Cron is already running" << endl;
             return 0;
         } catch(exception &e) {
-            cout << "Error occured on starting Cron, check logs" << endl;
+            cout << "Error occurred" << endl;
             return 0;
         }
         cout << "Cron started" << endl;
@@ -32,9 +32,9 @@ int main(int argc, char **argv) {
             string response = client.execute_command(argc, argv);
             cout << response;
         } catch(cron_not_running_exception &e) {
-            cout << "Cron is not running. Start Cron first" << endl;
+            cout << "Error: Cron is not running. Start Cron first" << endl;
         } catch(exception &e) {
-            cout << "Error occured while executing Command, check logs" << endl;
+            cout << "Error occurred while executing Command, check logs" << endl;
         }
     }
 
@@ -81,7 +81,7 @@ void Server::handle_connection(int server_sock) {
     socklen_t addrlen = sizeof(client_addr);
     int client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addrlen);
     if (client_sock<0) {
-        cout << "Error occured on acception connection" << endl;
+        cout << "Error occurred on acceptation connection" << endl;
         return;
     }
 
@@ -101,7 +101,7 @@ void Server::handle_connection(int server_sock) {
     // Send reply
     res = send(client_sock , reply.c_str() , reply.size() , 0);
     if(res < 0) {
-        cout << "Error occured on sending reply" << endl;
+        cout << "Error occurred on sending reply" << endl;
     }
 
     // Close connection
