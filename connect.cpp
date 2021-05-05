@@ -10,31 +10,28 @@ using namespace std;
 
 int main(int argc, char **argv) {
 
-    // Start Server Command
+    // Starting server
     if(argc == 1) {
         try {
             Server server;
             server.start_server();
-        } catch(cron_running_exception &e) {
-            cout << "Error: Cron is already running" << endl;
-            return 0;
-        } catch(exception &e) {
-            cout << "Error occurred" << endl;
-            return 0;
         }
-        cout << "Cron started" << endl;
+        catch(runtime_error& e) {
+            cout << "Error: " << e.what() << endl;
+            return EXIT_FAILURE;
+        }
     }
 
-    // Operation Command
+    // Operation
     else {
         try {
             Client client;
             string response = client.execute_command(argc, argv);
             cout << response;
-        } catch(cron_not_running_exception &e) {
-            cout << "Error: Cron is not running. Start Cron first" << endl;
-        } catch(exception &e) {
-            cout << "Error occurred while executing Command, check logs" << endl;
+        }
+        catch(runtime_error& e) {
+            cout << "Error: " << e.what() << endl;
+            return EXIT_FAILURE;
         }
     }
 
@@ -61,14 +58,13 @@ void Server::start_server() {
 
     res = bind(server_sock, (struct sockaddr *)&server_addr , sizeof(server_addr));
     if(res < 0)
-        throw cron_running_exception();
+        throw runtime_error("Cron is already running");
 
     // Listen
     res = listen(server_sock, 10);
     if(res < 0)
         throw exception();
 
-    cout << "Cron is running" << endl;
     while(true) {
         handle_connection(server_sock);
     }
@@ -80,28 +76,33 @@ void Server::handle_connection(int server_sock) {
     sockaddr_in client_addr;
     socklen_t addrlen = sizeof(client_addr);
     int client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addrlen);
-    if (client_sock<0) {
-        cout << "Error occurred on acceptation connection" << endl;
-        return;
-    }
+    if (client_sock<0)
+        throw runtime_error("Error occurred while acceptation connection");
 
     // Read Command
     char response_buff[2000];
     int res = recv(client_sock, response_buff , 2000 , 0);
     if(res < 0) {
-        cout << "Error occured on reading Command" << endl;
         close(client_sock);
-        return;
+        throw runtime_error("Error occurred on reading Command");
     }
     string command = string(response_buff, res);
 
     // Execute Command
-    string reply = interp.interpret(command);
+    string reply;
+    try {
+        reply = interp.interpret(command);
+    }
+    catch(...) {
+        close(client_sock);
+        throw;
+    }
 
     // Send reply
     res = send(client_sock , reply.c_str() , reply.size() , 0);
     if(res < 0) {
-        cout << "Error occurred on sending reply" << endl;
+        close(client_sock);
+        throw runtime_error("Error occurred on sending reply");
     }
 
     // Close connection
@@ -142,20 +143,27 @@ string Client::send_to_server(string command) {
     server.sin_port = htons(PORT);
 
     int res = connect(socket_desc ,(struct sockaddr *)&server , sizeof(server));
-    if (res < 0)
-        throw cron_not_running_exception();
+    if (res < 0) {
+        close(socket_desc);
+        throw runtime_error("Cron is not running. Start cron first");
+    }
 
     // Send Command
     res = send(socket_desc , command.c_str() , command.size() , 0);
-    if(res < 0)
-        throw exception();
+    if(res < 0) {
+        close(socket_desc);
+        throw runtime_error("Unable to send command to cron");
+    }
 
     // Receive response
     char response_buff[2000];
     res = recv(socket_desc, response_buff , 2000 , 0);
-    if(res < 0)
-        throw exception();
+    if(res < 0) {
+        close(socket_desc);
+        throw runtime_error("Unable to receive command from cron");
+    }
 
     // Display response
+    close(socket_desc);
     return string(response_buff, res);
 }
