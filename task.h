@@ -19,7 +19,7 @@ public:
     Time get_repeat_time() const;
     std::string get_command() const;
     std::vector<std::string> get_arguments() const;
-    bool is_active();
+    bool is_active() const;
 
     void run();
     void schedule();

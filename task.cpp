@@ -38,7 +38,7 @@ std::vector<std::string> Task::get_arguments() const {
     return args;
 }
 
-bool Task::is_active() {
+bool Task::is_active() const {
     return active;
 }
 
@@ -69,15 +69,6 @@ void Task::schedule() {
     timespec.it_value.tv_sec = base_time.get_seconds();
     timespec.it_interval.tv_sec = repeat_time.get_seconds();
 
-    long diff = timespec.it_value.tv_sec - time(NULL);
-    cout << "Diff=" << diff << endl;
-
-    if(base_time.is_relative()) {
-        cout << "relative" << endl;
-    }
-    else {
-        cout << "absolute" << endl;
-    }
     res = timer_settime(timer, base_time.is_relative() ? 0 : TIMER_ABSTIME, &timespec, NULL);
     assert(res == 0);
 }
