@@ -2,6 +2,7 @@
 #include "time.h"
 #include <vector>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -22,7 +23,7 @@ string Interpreter::interpret(std::string command) {
         add_command(args, stream);
         return stream.str();
     }
-    else if(tokens[0] == "remove") {
+    else if(tokens[0] == "rm") {
         remove_command(args, stream);
         return stream.str();
     }
@@ -100,7 +101,7 @@ void Interpreter::add_command(vector<string> arguments, stringstream &out) {
     }
     catch(ArgumentsException &e) {
         out << "Invalid arguments" << endl;
-        out << "Proper usage: cron add [-r] s.m.h.d.m.y [s.m.h.d.m.y] command [arguments...]" << endl;
+        out << "Proper usage: cron add [-r] <s.m.h.d.m.y> [-c s.m.h.d.m.y] <command> [arguments...]" << endl;
     }
     catch(InvalidTimeException &e) {
         out << "Invalid time format" << endl;
@@ -108,15 +109,49 @@ void Interpreter::add_command(vector<string> arguments, stringstream &out) {
 }
 
 void Interpreter::remove_command(vector<string> arguments, stringstream &out) {
-    out << "remove command";
+    try {
+        if(arguments.size() != 1)
+            throw ArgumentsException();
+
+        int id = stoi(arguments[0]);
+
+        cron.remove_task(id);
+        out << "Task with id " << id << " removed" << endl;
+    }
+    catch(ArgumentsException &e) {
+        out << "Invalid arguments" << endl;
+        out << "Proper usage: cron rm <id>" << endl;
+    }
 }
 
 void Interpreter::list_command(stringstream &out) {
-    list<Task> tasks = cron.get_tasks();
-    out << "list command";
+    list<Task*> tasks = cron.get_tasks();
+
+    if(tasks.size() == 0) {
+        out << "No scheduled tasks" << endl;
+        return;
+    }
+
+    for(Task *task : tasks) {
+        print_task(out, task);
+    }
 }
 
 void Interpreter::exit_command(stringstream &out) {
     cron.exit();
     out << "exit command";
+}
+
+void Interpreter::print_task(ostream &os, Task *task) {
+    os << task->get_id() << " ";
+    if(task->get_base_time().is_relative())
+        os << "-r ";
+    os << task->get_base_time() << " ";
+    if(task->get_repeat_time().get_seconds() != 0)
+        os << "-c " << task->get_repeat_time() << " ";
+    os << task->get_command() << " ";
+    for (string arg : task->get_arguments()) {
+        os << arg << " ";
+    }
+    os << endl;
 }

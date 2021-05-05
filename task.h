@@ -1,6 +1,7 @@
 #ifndef CRON_TASK_H
 #define CRON_TASK_H
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <csignal>
@@ -8,9 +9,16 @@
 
 
 class Task {
+
 public:
     Task(std::string command, std::vector<std::string> args, Time base_time, Time repeat_time);
-    int get_id();
+
+    int get_id() const;
+    Time get_base_time() const;
+    Time get_repeat_time() const;
+    std::string get_command() const;
+    std::vector<std::string> get_arguments() const;
+
     void run();
     void schedule();
     void cancel();

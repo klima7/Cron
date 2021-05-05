@@ -2,6 +2,7 @@
 #include <csignal>
 #include <ctime>
 #include <cassert>
+#include <iomanip>
 #include "task.h"
 
 using namespace std;
@@ -16,8 +17,24 @@ Task::Task(std::string command, std::vector<std::string> args, Time base_time, T
     this->repeat_time = repeat_time;
 }
 
-int Task::get_id() {
+int Task::get_id() const {
     return id;
+}
+
+Time Task::get_base_time() const {
+    return base_time;
+}
+
+Time Task::get_repeat_time() const {
+    return repeat_time;
+}
+
+std::string Task::get_command() const {
+    return command;
+}
+
+std::vector<std::string> Task::get_arguments() const {
+    return args;
 }
 
 void Task::run() {

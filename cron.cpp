@@ -23,8 +23,8 @@ void Cron::remove_task(int task_id) {
     }
 }
 
-std::list<Task> Cron::get_tasks() {
-    return list<Task>();
+std::list<Task*> Cron::get_tasks() {
+    return tasks;
 }
 
 void Cron::exit() {

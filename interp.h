@@ -20,8 +20,8 @@ private:
     void remove_command(std::vector<std::string> arguments, std::stringstream &out);
     void add_command(std::vector<std::string> arguments, std::stringstream &out);
     void exit_command(std::stringstream &out);
+    void print_task(std::ostream &os, Task *task);
     Cron cron;
 };
-
 
 #endif
