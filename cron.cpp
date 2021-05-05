@@ -16,21 +16,27 @@ void Cron::remove_task(int task_id) {
         Task *task = *iter;
         if(task->get_id() == task_id) {
             task->cancel();
-            delete task;
-            tasks.erase(iter);
             return;
         }
     }
 }
 
-std::list<Task*> Cron::get_tasks() {
-    return tasks;
+std::list<Task> Cron::get_tasks() {
+    list<Task> active_tasks;
+    for(Task *task : tasks) {
+        if(!task->is_done())
+            active_tasks.push_back(*task);
+    }
+    return active_tasks;
 }
 
 int Cron::exit() {
-    int count = tasks.size();
+    int count = 0;
     for(Task *task : tasks) {
-        task->cancel();
+        if(!task->is_done()) {
+            task->cancel();
+            count++;
+        }
         delete task;
     }
     tasks.clear();
@@ -41,3 +47,4 @@ int Cron::exit() {
 bool Cron::is_exited() {
     return exited;
 }
+

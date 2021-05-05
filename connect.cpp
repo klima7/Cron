@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
         try {
             Client client;
             string response = client.execute_command(argc, argv);
-            cout << response << endl;
+            cout << response;
         } catch(cron_not_running_exception &e) {
             cout << "Cron is not running. Start Cron first" << endl;
         } catch(exception &e) {

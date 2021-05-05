@@ -15,6 +15,7 @@ Task::Task(std::string command, std::vector<std::string> args, Time base_time, T
     this->id = next_id++;
     this->base_time = base_time;
     this->repeat_time = repeat_time;
+    this->done = false;
 }
 
 int Task::get_id() const {
@@ -37,6 +38,10 @@ std::vector<std::string> Task::get_arguments() const {
     return args;
 }
 
+bool Task::is_done() {
+    return done;
+}
+
 void Task::run() {
     pid_t child_pid;
     char* arg_list[args.size()+1];
@@ -48,6 +53,7 @@ void Task::run() {
 
 void Task::cancel() {
     timer_delete(timer);
+    done = true;
 }
 
 void Task::schedule() {
@@ -78,6 +84,9 @@ void Task::schedule() {
 
 void Task::callback(__sigval_t arg) {
     Task *task = (Task*)arg.sival_ptr;
+    if(task->get_repeat_time().get_seconds() == 0)
+        task->done = true;
     cout << "Starting task" << endl;
     task->run();
 }
+

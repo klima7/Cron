@@ -2,7 +2,6 @@
 #include "time.h"
 #include <vector>
 #include <sstream>
-#include <iomanip>
 
 using namespace std;
 
@@ -123,15 +122,15 @@ void Interpreter::remove_command(vector<string> arguments, stringstream &out) {
 }
 
 void Interpreter::list_command(stringstream &out) {
-    list<Task*> tasks = cron.get_tasks();
+    list<Task> tasks = cron.get_tasks();
 
     if(tasks.size() == 0) {
         out << "No scheduled tasks" << endl;
         return;
     }
 
-    for(Task *task : tasks) {
-        print_task(out, task);
+    for(Task task : tasks) {
+        print_task(out, &task);
     }
 }
 

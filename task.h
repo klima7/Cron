@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <list>
 #include <csignal>
 #include "time.h"
 
@@ -18,6 +19,7 @@ public:
     Time get_repeat_time() const;
     std::string get_command() const;
     std::vector<std::string> get_arguments() const;
+    bool is_done();
 
     void run();
     void schedule();
@@ -33,6 +35,7 @@ private:
     timer_t timer;
     Time base_time;
     Time repeat_time;
+    bool done;
 
     static void callback(__sigval_t arg);
 };
