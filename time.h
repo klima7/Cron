@@ -7,16 +7,12 @@
 #include <stdexcept>
 
 
-class InvalidTimeException: public std::exception {};
-
-
 class Time {
     friend std::ostream& operator<<(std::ostream &os, const Time &time);
 public:
     Time(bool relative=true, std::string str_time="0.0.0.0.0.0");
     Time(bool relative, int second, int minute, int hour, int day, int month, int year);
     bool is_relative() const;
-    long get_seconds();
     long get_relative_seconds() const;
     long get_absolute_seconds() const;
 private:

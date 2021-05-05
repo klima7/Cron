@@ -86,8 +86,8 @@ void Interpreter::add_command(vector<string> arguments, stringstream &out) {
         out << "Invalid arguments" << endl;
         out << "Proper usage: cron add [-r] <s.m.h.d.m.y> [-c s.m.h.d.m.y] <command> [arguments...]" << endl;
     }
-    catch(InvalidTimeException &e) {
-        out << "Error: Invalid time format" << endl;
+    catch(runtime_error& e) {
+        out << "Error: " << e.what() << endl;
     }
 }
 
@@ -140,7 +140,7 @@ void Interpreter::print_task(ostream &os, Task *task) {
     if(task->get_base_time().is_relative())
         os << "-r ";
     os << task->get_base_time() << " ";
-    if(task->get_repeat_time().get_seconds() != 0)
+    if(task->get_repeat_time().get_relative_seconds() != 0)
         os << "-c " << task->get_repeat_time() << " ";
     os << task->get_command() << " ";
     for (string arg : task->get_arguments()) {

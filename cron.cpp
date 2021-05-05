@@ -7,8 +7,13 @@ using namespace std;
 
 void Cron::add_task(string path, vector<string> args, Time base_time, Time repeat_time) {
     Task *task = new Task(path, args, base_time, repeat_time);
-    tasks.push_back(task);
-    task->schedule();
+    try {
+        task->schedule();
+        tasks.push_back(task);
+    } catch(runtime_error&) {
+        delete task;
+        throw;
+    }
 }
 
 bool Cron::remove_task(int task_id) {

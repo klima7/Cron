@@ -57,27 +57,50 @@ void Task::cancel() {
 }
 
 void Task::schedule() {
+
+    // Create event
     struct sigevent event = {0};
     event.sigev_notify = SIGEV_THREAD;
     event.sigev_notify_function = Task::callback;
     event.sigev_value.sival_ptr = this;
 
+    // Create timer
     int res = timer_create(CLOCK_REALTIME, &event, &timer);
-    assert(res == 0);
+    if(res != 0)
+        throw runtime_error("Unable to create clock");
 
+    // Validate relative time
+    long seconds;
+    if(base_time.is_relative()) {
+        seconds = base_time.get_relative_seconds();
+        if(seconds < 0)
+            throw runtime_error("Provided relative time must be positive");
+    }
+
+    // Validate absolute time
+    else {
+        seconds = base_time.get_absolute_seconds();
+        long curr_seconds = time(NULL);
+        if(curr_seconds > seconds) {
+            throw runtime_error("Provided absolute time already elapsed");
+        }
+    }
+
+    // Define delays
     struct itimerspec timespec = {0};
-    timespec.it_value.tv_sec = base_time.get_seconds();
-    timespec.it_interval.tv_sec = repeat_time.get_seconds();
+    timespec.it_interval.tv_sec = repeat_time.get_relative_seconds();
+    timespec.it_value.tv_sec = seconds;
 
+    // Start timer
     res = timer_settime(timer, base_time.is_relative() ? 0 : TIMER_ABSTIME, &timespec, NULL);
-    assert(res == 0);
+    if(res != 0)
+        throw runtime_error("Unable to start timer");
 }
 
 void Task::callback(__sigval_t arg) {
     Task *task = (Task*)arg.sival_ptr;
-    if(task->get_repeat_time().get_seconds() == 0)
+    if(task->get_repeat_time().get_relative_seconds() == 0)
         task->active = false;
-    cout << "Starting task" << endl;
     task->run();
 }
 

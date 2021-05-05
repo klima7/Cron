@@ -11,16 +11,16 @@ Time::Time(bool relative, string str_time) {
     
     vector<string> tokens = tokenize(str_time, ".");
     if(tokens.size() != 6)
-        throw InvalidTimeException();
+        throw runtime_error("Invalid parts if time expression");
 
     int index = 0;
     for(string token : tokens) {
         if(token.length() == 0)
-            throw InvalidTimeException();
+            throw runtime_error("Invalid characters is time expression");
         size_t read_chars;
         numbers[index] = stoi(token, &read_chars);
         if(read_chars != token.length())
-            throw InvalidTimeException();
+            throw runtime_error("Invalid number is time expression");
         index++;
     }
 
@@ -45,11 +45,6 @@ Time::Time(bool relative, int second, int minute, int hour, int day, int month, 
 
 bool Time::is_relative() const {
     return relative;
-}
-
-long Time::get_seconds() {
-    if(relative) return get_relative_seconds();
-    else return get_absolute_seconds();
 }
 
 long Time::get_relative_seconds() const {
