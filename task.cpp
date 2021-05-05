@@ -44,14 +44,23 @@ void AbsTask::schedule() {
     struct itimerspec timespec = {0};
     timespec.it_value.tv_sec = base_time->get_seconds_since_1970();
 
+    long diff = base_time->get_seconds_since_1970() - time(NULL);
+    cout << "Diff=" << diff << endl;
+
     res = timer_settime(timer, TIMER_ABSTIME, &timespec, NULL);
     assert(res == 0);
 }
 
 void AbsTask::callback(__sigval_t arg) {
     AbsTask *task = (AbsTask*)arg.sival_ptr;
-    cout << "Starting task" << endl;
+    cout << "Starting task 1" << endl;
     task->run();
+    if(task->repeat_time != NULL) {
+        cout << "here 1" << endl;
+        cout << *task->repeat_time << endl;
+        task->base_time = task->base_time->add(*task->repeat_time);
+        task->schedule();
+    }
 }
 
 void RelTask::schedule() {

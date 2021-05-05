@@ -5,8 +5,14 @@
 
 using namespace std;
 
-void Cron::add_task(string path, vector<string> args, Time base_time) {
-    SchedTask *task = new AbsTask(path, args, &base_time, NULL);
+void Cron::add_task(string path, vector<string> args, Time *base_time) {
+    SchedTask *task = new AbsTask(path, args, base_time, NULL);
+    tasks.push_back(task);
+    task->schedule();
+}
+
+void Cron::add_task(string path, vector<string> args, Time *base_time, Time *repeat_time) {
+    SchedTask *task = new AbsTask(path, args, base_time, repeat_time);
     tasks.push_back(task);
     task->schedule();
 }

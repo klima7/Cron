@@ -30,6 +30,15 @@ Time::Time(string str_time) {
     year = numbers[5];
 }
 
+Time::Time(int second, int minute, int hour, int day, int month, int year) {
+    this->second = second;
+    this->minute = minute;
+    this->hour = hour;
+    this->day = day;
+    this->month = month;
+    this->year = year;
+}
+
 list<string> Time::get_tokens(string text, string delimiter) {
     list<string> tokens;
     size_t pos = 0;
@@ -63,6 +72,28 @@ long Time::get_seconds_since_1970() {
     cal.tm_year = year - 1900;
     cal.tm_isdst = daylight_saving;
     return mktime(&cal);
+}
+
+Time *Time::add(const Time &other) {
+    time_t t1 = time(NULL);
+    struct tm *t2 = localtime(&t1);
+    int daylight_saving = t2->tm_isdst;
+
+    struct tm cal = {0};
+    cal.tm_sec = second + other.second;
+    cal.tm_min = minute + other.minute;
+    cal.tm_hour = hour + other.hour;
+    cal.tm_mday = day + other.day;
+    cal.tm_mon = month + other.month - 1;
+    cal.tm_year = year + other.year - 1900;
+    cal.tm_isdst = daylight_saving;
+
+    mktime(&cal);
+
+    cal.tm_mon += 1;
+    cal.tm_year += 1900;
+
+    return new Time(cal.tm_sec, cal.tm_min, cal.tm_hour, cal.tm_mday, cal.tm_mon, cal.tm_year);
 }
 
 std::ostream& operator<<(std::ostream &os, const Time &time) {

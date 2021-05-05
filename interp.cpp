@@ -92,13 +92,13 @@ void Interpreter::add_command(vector<string> arguments, stringstream &out) {
         vector<string> cmd_arguments = vector<string>(iter, arguments.end());
 
         // Create task
-        Time base_time = Time(base_time_str);
+        Time *base_time = new Time(base_time_str);
         if(repeat_time_str.length() == 0) {
             cron.add_task(cmd, cmd_arguments, base_time);
         }
         else {
-            Time repeat_time = Time(repeat_time_str);
-            cron.add_task(cmd, cmd_arguments, base_time);
+            Time *repeat_time = new Time(repeat_time_str);
+            cron.add_task(cmd, cmd_arguments, base_time, repeat_time);
         }
 
         out << "Task added" << endl;
