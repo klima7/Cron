@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Time::Time(string str_time) {
+Time::Time(bool relative, string str_time) {
     int numbers[6];
     
     list<string> tokens = get_tokens(str_time, ".");
@@ -22,6 +22,7 @@ Time::Time(string str_time) {
         index++;
     }
 
+    relative = relative;
     second = numbers[0];
     minute = numbers[1];
     hour = numbers[2];
@@ -30,7 +31,8 @@ Time::Time(string str_time) {
     year = numbers[5];
 }
 
-Time::Time(int second, int minute, int hour, int day, int month, int year) {
+Time::Time(bool relative, int second, int minute, int hour, int day, int month, int year) {
+    this->relative = relative;
     this->second = second;
     this->minute = minute;
     this->hour = hour;
@@ -54,11 +56,20 @@ list<string> Time::get_tokens(string text, string delimiter) {
     return tokens;
 }
 
+bool Time::is_relative() {
+    return relative;
+}
+
 long Time::get_seconds() {
+    if(relative) return get_relative_seconds();
+    else return get_absolute_seconds();
+}
+
+long Time::get_relative_seconds() {
     return second + minute*60 + hour*3600 + day*3600*24 + month*3600*24*30 + year*3600*24*30*365;
 }
 
-long Time::get_seconds_since_1970() {
+long Time::get_absolute_seconds() {
     time_t t1 = time(NULL);
     struct tm *t2 = localtime(&t1);
     int daylight_saving = t2->tm_isdst;
@@ -72,28 +83,6 @@ long Time::get_seconds_since_1970() {
     cal.tm_year = year - 1900;
     cal.tm_isdst = daylight_saving;
     return mktime(&cal);
-}
-
-Time *Time::add(const Time &other) {
-    time_t t1 = time(NULL);
-    struct tm *t2 = localtime(&t1);
-    int daylight_saving = t2->tm_isdst;
-
-    struct tm cal = {0};
-    cal.tm_sec = second + other.second;
-    cal.tm_min = minute + other.minute;
-    cal.tm_hour = hour + other.hour;
-    cal.tm_mday = day + other.day;
-    cal.tm_mon = month + other.month - 1;
-    cal.tm_year = year + other.year - 1900;
-    cal.tm_isdst = daylight_saving;
-
-    mktime(&cal);
-
-    cal.tm_mon += 1;
-    cal.tm_year += 1900;
-
-    return new Time(cal.tm_sec, cal.tm_min, cal.tm_hour, cal.tm_mday, cal.tm_mon, cal.tm_year);
 }
 
 std::ostream& operator<<(std::ostream &os, const Time &time) {
