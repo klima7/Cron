@@ -105,15 +105,15 @@ void Interpreter::remove_command(vector<string> arguments, stringstream &out) {
             return;
         }
 
-        bool success = cron.remove_task(id);
-        if(success)
-            out << "Task with id " << id << " removed" << endl;
-        else
-            out << "Error: Unable to find task with given id " << endl;
+        cron.remove_task(id);
+        out << "Task with id " << id << " removed" << endl;
     }
     catch(ArgumentsException &e) {
         out << "Invalid arguments" << endl;
         out << "Proper usage: cron rm <id>" << endl;
+    }
+    catch(runtime_error& e) {
+        out << "Error: " << e.what() << endl;
     }
 }
 

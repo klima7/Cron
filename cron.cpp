@@ -16,15 +16,14 @@ void Cron::add_task(string path, vector<string> args, Time base_time, Time repea
     }
 }
 
-bool Cron::remove_task(int task_id) {
-    for(auto iter=tasks.begin(); iter != tasks.end(); iter++) {
-        Task *task = *iter;
+void Cron::remove_task(int task_id) {
+    for(auto task : tasks) {
         if(task->is_active() && task->get_id() == task_id) {
             task->cancel();
-            return true;
+            return;
         }
     }
-    return false;
+    throw runtime_error("Unable to find task with given id");
 }
 
 std::list<Task> Cron::get_tasks() const {
