@@ -27,6 +27,17 @@ std::list<Task*> Cron::get_tasks() {
     return tasks;
 }
 
-void Cron::exit() {
+int Cron::exit() {
+    int count = tasks.size();
+    for(Task *task : tasks) {
+        task->cancel();
+        delete task;
+    }
+    tasks.clear();
+    exited = true;
+    return count;
+}
 
+bool Cron::is_exited() {
+    return exited;
 }

@@ -11,7 +11,7 @@
 
 class Interpreter {
 public:
-    Interpreter(Cron cron);
+    Interpreter(Cron &cron);
     std::string interpret(std::string command);
 private:
     class ArgumentsException: public std::exception {};
@@ -21,7 +21,7 @@ private:
     void add_command(std::vector<std::string> arguments, std::stringstream &out);
     void exit_command(std::stringstream &out);
     void print_task(std::ostream &os, Task *task);
-    Cron cron;
+    Cron &cron;
 };
 
 #endif

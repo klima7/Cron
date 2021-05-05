@@ -102,12 +102,14 @@ void Server::handle_connection(int server_sock) {
     res = send(client_sock , reply.c_str() , reply.size() , 0);
     if(res < 0) {
         cout << "Error occured on sending reply" << endl;
-        close(client_sock);
-        return;
     }
 
     // Close connection
     close(client_sock);
+
+    if(cron.is_exited()) {
+        exit(0);
+    }
 }
 
 string Client::execute_command(int argc, char **argv) {

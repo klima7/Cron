@@ -6,9 +6,7 @@
 
 using namespace std;
 
-Interpreter::Interpreter(Cron cron) {
-    this->cron = cron;
-}
+Interpreter::Interpreter(Cron &cron): cron(cron) { }
 
 string Interpreter::interpret(std::string command) {
 
@@ -138,8 +136,8 @@ void Interpreter::list_command(stringstream &out) {
 }
 
 void Interpreter::exit_command(stringstream &out) {
-    cron.exit();
-    out << "exit command";
+    int count = cron.exit();
+    out << "Cron exited. " << count << " tasks canceled" << endl;
 }
 
 void Interpreter::print_task(ostream &os, Task *task) {
