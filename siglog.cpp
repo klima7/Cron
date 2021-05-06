@@ -9,10 +9,11 @@
 #include <semaphore.h>
 #include <csignal>
 #include <string>
-#include <unistd.h>
 #include <cstdarg>
 #include <ctime>
 #include <cstdlib>
+#include <cassert>
+#include <cstring>
 #include "siglog.h"
 
 #define DATE_FORMAT "%m/%d/%y %H:%M:%S"
@@ -23,7 +24,7 @@ namespace siglog {
 
 // Global variables
     static int initialized;
-    static const char *logging_directory;
+    static char logging_directory[40];
     static LEVEL current_logging_level;
     static int level_signal, dump_signal;
     static pthread_t level_tid, dump_tid;
@@ -73,16 +74,21 @@ namespace siglog {
 
         // Wait for level change signal and handle it
         while (1) {
+            printf("Hello 0");
             sem_wait(&sem_level);
+            printf("Hello 1");
 
             if (level_signal_val == -1)
                 continue;
+            printf("Hello 2");
 
             if (level_signal_val >= DISABLED && level_signal_val <= MIN) {
+                printf("Hello 3");
                 pthread_mutex_lock(&log_mutex);
                 current_logging_level = (LEVEL) level_signal_val;
                 pthread_mutex_unlock(&log_mutex);
             }
+            printf("Hello 4");
 
             level_signal_val = -1;
         }
@@ -134,6 +140,7 @@ namespace siglog {
 
         // Open file
         FILE *file = fopen(path, "w");
+        assert(file != NULL);
 
         // Write header line to dump file
         fprintf(file, "%s\n", filename);
@@ -164,7 +171,7 @@ namespace siglog {
         // Init some global vars
         dump_functions_capacity = 4;
         current_logging_level = level;
-        logging_directory = path;
+        strcpy(logging_directory, path);
         level_signal = level_sig;
         dump_signal = dump_sig;
         level_signal_val = -1;

@@ -13,7 +13,10 @@ public:
     std::list<Task> get_tasks() const;
     int exit();
     bool is_exited() const;
+    void init_dump();
 private:
+    static Cron *dump_cron;
+    static void dump(FILE *file);
     bool exited = false;
     std::list<Task*> tasks;
 };

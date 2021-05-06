@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 #include <pwd.h>
 #include <sys/stat.h>
-#include <string.h>
+#include <cstring>
 
 using namespace std;
 
@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
         }
         catch(runtime_error& e) {
             cout << "Error occurred. Cron is probably already running. Check logs" << endl;
+            cout << e.what() << endl;
             siglog::max((string("Error: ") + e.what()).c_str());
             return EXIT_FAILURE;
         }
@@ -58,6 +59,7 @@ static void start_logging() {
         mkdir(path, 0700);
 
     siglog::init(SIGRTMIN, SIGRTMIN+1, siglog::MIN, path);
+    cout << SIGRTMIN << endl;
 }
 
 void Server::start_server() {
@@ -88,7 +90,9 @@ void Server::start_server() {
     if(res < 0)
         throw runtime_error("Unable to listen on socket");
 
-    siglog::standard("Cron started");
+    cron.init_dump();
+
+    siglog::standard("Cron started, pid=%d", getpid());
 
     while(true) {
         handle_connection(server_sock);
@@ -102,7 +106,7 @@ void Server::handle_connection(int server_sock) {
     socklen_t addrlen = sizeof(client_addr);
     int client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addrlen);
     if (client_sock<0)
-        throw runtime_error("Unable to accept connection");
+        return;
 
     // Read Command
     char response_buff[2000];

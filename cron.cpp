@@ -3,8 +3,11 @@
 #include "siglog.h"
 #include <list>
 #include <vector>
+#include <sstream>
 
 using namespace std;
+
+Cron* Cron::dump_cron = NULL;
 
 void Cron::add_task(string path, vector<string> args, Time base_time, Time repeat_time) {
     Task *task = new Task(path, args, base_time, repeat_time);
@@ -61,3 +64,16 @@ bool Cron::is_exited() const {
     return exited;
 }
 
+void Cron::dump(FILE *file) {
+    stringstream ss;
+    std::list<Task> tasks = dump_cron->get_tasks();
+    for(Task task : tasks)
+        ss << &task << endl;
+    fprintf(file, "%s", ss.str().c_str());
+}
+
+void Cron::init_dump() {
+    siglog::min("Initializing dump");
+    dump_cron = this;
+    siglog::register_dump_function(dump);
+}
