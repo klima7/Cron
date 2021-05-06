@@ -5,23 +5,23 @@ namespace siglog {
 
     // Types
     enum siglog_level_t {
-        SIGLOG_DISABLED, SIGLOG_MAX, SIGLOG_STANDARD, SIGLOG_MIN
+        DISABLED, MAX, STANDARD, MIN
     };
-    typedef enum siglog_level_t SIGLOG_LEVEL;
+    typedef enum siglog_level_t LEVEL;
     typedef void (*DUMP_FUNCTION)(FILE *file);
 
     // Lifecycle functions
-    int siglog_init(int level_sig, int dump_sig, SIGLOG_LEVEL level, char *dir_path);
-    void siglog_free();
+    int init(int level_sig, int dump_sig, LEVEL level, char *dir_path);
+    void free();
 
     // Logging functions
-    void siglog_log(SIGLOG_LEVEL level, char *fmt, ...);
-    void siglog_min(char *fmt, ...);
-    void siglog_standard(char *fmt, ...);
-    void siglog_max(char *fmt, ...);
+    void log(LEVEL level, char *fmt, ...);
+    void min(char *fmt, ...);
+    void standard(char *fmt, ...);
+    void max(char *fmt, ...);
 
     // Dumping functions
-    int siglog_register_dump_function(DUMP_FUNCTION fun);
+    int register_dump_function(DUMP_FUNCTION fun);
 }
 
 #endif

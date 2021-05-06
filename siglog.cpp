@@ -24,7 +24,7 @@ namespace siglog {
 // Global variables
     static int initialized;
     static char *logging_directory;
-    static SIGLOG_LEVEL current_logging_level;
+    static LEVEL current_logging_level;
     static int level_signal, dump_signal;
     static pthread_t level_tid, dump_tid;
     static FILE *log_file;
@@ -49,9 +49,9 @@ namespace siglog {
 
     static FILE *create_dump_file();
 
-    static string str_level(SIGLOG_LEVEL lvl);
+    static string str_level(LEVEL lvl);
 
-    static void vlog(SIGLOG_LEVEL level, char *fmt, va_list vargs);
+    static void vlog(LEVEL level, char *fmt, va_list vargs);
 
 // Variables to synchronize level signal handling
     static sem_t sem_level;
@@ -78,9 +78,9 @@ namespace siglog {
             if (level_signal_val == -1)
                 continue;
 
-            if (level_signal_val >= SIGLOG_DISABLED && level_signal_val <= SIGLOG_MIN) {
+            if (level_signal_val >= DISABLED && level_signal_val <= MIN) {
                 pthread_mutex_lock(&log_mutex);
-                current_logging_level = (SIGLOG_LEVEL) level_signal_val;
+                current_logging_level = (LEVEL) level_signal_val;
                 pthread_mutex_unlock(&log_mutex);
             }
 
@@ -151,7 +151,7 @@ namespace siglog {
  * level - initial logging level
  * path - path to existing directory where log and dump files should appear. NULL if current directory
  */
-    int siglog_init(int level_sig, int dump_sig, SIGLOG_LEVEL level, char *path) {
+    int init(int level_sig, int dump_sig, LEVEL level, char *path) {
 
         // Local variables
         sigset_t set;
@@ -306,7 +306,7 @@ namespace siglog {
 /*
  * Function disposing all allocated resources
  */
-    void siglog_free() {
+    void free() {
         if (!initialized) return;
 
         pthread_cancel(level_tid);
@@ -322,13 +322,13 @@ namespace siglog {
     }
 
 // Auxiliary function converting logging level to readable form
-    static string str_level(SIGLOG_LEVEL lvl) {
+    static string str_level(LEVEL lvl) {
         switch (lvl) {
-            case SIGLOG_MAX:
+            case MAX:
                 return "MAX";
-            case SIGLOG_STANDARD:
+            case STANDARD:
                 return "STANDARD";
-            case SIGLOG_MIN:
+            case MIN:
                 return "MIN";
             default:
                 return "";
@@ -336,8 +336,8 @@ namespace siglog {
     }
 
 // Auxiliary logging function accepting va_list
-    static void vlog(SIGLOG_LEVEL level, char *fmt, va_list vargs) {
-        if (!initialized || level == SIGLOG_DISABLED) return;
+    static void vlog(LEVEL level, char *fmt, va_list vargs) {
+        if (!initialized || level == DISABLED) return;
 
         if (level <= current_logging_level) {
 
@@ -365,7 +365,7 @@ namespace siglog {
  * level - loggin level
  * fmt, ... - arguments similar to printf
  */
-    void siglog_log(SIGLOG_LEVEL level, char *fmt, ...) {
+    void log(LEVEL level, char *fmt, ...) {
         va_list valist;
         va_start(valist, fmt);
         vlog(level, fmt, valist);
@@ -376,10 +376,10 @@ namespace siglog {
  * Function to add log entry with maximum priority
  * fmt, ... - arguments similar to printf
  */
-    void siglog_max(char *fmt, ...) {
+    void max(char *fmt, ...) {
         va_list valist;
         va_start(valist, fmt);
-        vlog(SIGLOG_MAX, fmt, valist);
+        vlog(MAX, fmt, valist);
         va_end(valist);
     }
 
@@ -387,10 +387,10 @@ namespace siglog {
  * Function to add log entry with standard priority
  * fmt, ... - arguments similar to printf
  */
-    void siglog_standard(char *fmt, ...) {
+    void standard(char *fmt, ...) {
         va_list valist;
         va_start(valist, fmt);
-        vlog(SIGLOG_STANDARD, fmt, valist);
+        vlog(STANDARD, fmt, valist);
         va_end(valist);
     }
 
@@ -398,10 +398,10 @@ namespace siglog {
  * Function to add log entry with minimum priority
  * fmt, ... - arguments similar to printf
  */
-    void siglog_min(char *fmt, ...) {
+    void min(char *fmt, ...) {
         va_list valist;
         va_start(valist, fmt);
-        vlog(SIGLOG_MIN, fmt, valist);
+        vlog(MIN, fmt, valist);
         va_end(valist);
     }
 
@@ -415,7 +415,7 @@ namespace siglog {
  *
  * Return value: 0 in case of success, else -1
  */
-    int siglog_register_dump_function(DUMP_FUNCTION fun) {
+    int register_dump_function(DUMP_FUNCTION fun) {
         if (!initialized) return -1;
 
         pthread_mutex_lock(&dump_mutex);
