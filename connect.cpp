@@ -120,7 +120,7 @@ void Server::handle_connection(int server_sock) {
     }
     catch(...) {
         close(client_sock);
-        throw;
+        return;
     }
 
     // Send reply

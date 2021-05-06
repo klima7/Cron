@@ -1,9 +1,9 @@
 #include <spawn.h>
 #include <csignal>
 #include <ctime>
-#include <cassert>
 #include <iomanip>
 #include "task.h"
+#include "siglog.h"
 
 using namespace std;
 
@@ -43,6 +43,7 @@ bool Task::is_active() const {
 }
 
 void Task::run() {
+    siglog::min("Task with id %d running", id);
     pid_t child_pid;
     char* arg_list[args.size()+1];
     for(int i=0; i<args.size(); i++)
@@ -52,11 +53,13 @@ void Task::run() {
 }
 
 void Task::cancel() {
+    siglog::min("Task with id %d cancelled", id);
     timer_delete(timer);
     active = false;
 }
 
 void Task::schedule() {
+    siglog::min("Task with id %d scheduled", id);
 
     // Create event
     struct sigevent event = {0};
@@ -99,8 +102,10 @@ void Task::schedule() {
 
 void Task::callback(__sigval_t arg) {
     Task *task = (Task*)arg.sival_ptr;
-    if(task->get_repeat_time().get_relative_seconds() == 0)
+    if(task->get_repeat_time().get_relative_seconds() == 0) {
+        siglog::min("Task %d is done", task->id);
         task->active = false;
+    }
     task->run();
 }
 

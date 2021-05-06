@@ -12,7 +12,8 @@ void Cron::add_task(string path, vector<string> args, Time base_time, Time repea
         task->schedule();
         tasks.push_back(task);
         siglog::standard("New task added with id %d", task->get_id());
-    } catch(runtime_error&) {
+    } catch(runtime_error& e) {
+        siglog::max((string("Error: ") + e.what()).c_str());
         delete task;
         throw;
     }
