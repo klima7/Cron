@@ -134,7 +134,7 @@ void Interpreter::list_command(stringstream &out) {
     }
 
     for(Task task : tasks) {
-        print_task(out, &task);
+        out << &task << endl;
     }
 }
 
@@ -142,18 +142,4 @@ void Interpreter::exit_command(stringstream &out) {
     siglog::standard("Exit command received");
     int count = cron.exit();
     out << "Cron exited. " << count << " tasks canceled" << endl;
-}
-
-void Interpreter::print_task(ostream &os, Task *task) {
-    os << task->get_id() << " ";
-    if(task->get_base_time().is_relative())
-        os << "-r ";
-    os << task->get_base_time() << " ";
-    if(task->get_repeat_time().get_relative_seconds() != 0)
-        os << "-c " << task->get_repeat_time() << " ";
-    os << task->get_command() << " ";
-    for (string arg : task->get_arguments()) {
-        os << arg << " ";
-    }
-    os << endl;
 }

@@ -40,5 +40,6 @@ private:
     static void callback(__sigval_t arg);
 };
 
+std::ostream &operator<<(std::ostream &os, const Task *task);
 
 #endif

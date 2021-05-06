@@ -109,3 +109,16 @@ void Task::callback(__sigval_t arg) {
     task->run();
 }
 
+ostream &operator<<(ostream &os, const Task *task) {
+    os << task->get_id() << " ";
+    if(task->get_base_time().is_relative())
+        os << "-r ";
+    os << task->get_base_time() << " ";
+    if(task->get_repeat_time().get_relative_seconds() != 0)
+        os << "-c " << task->get_repeat_time() << " ";
+    os << task->get_command() << " ";
+    for (string arg : task->get_arguments()) {
+        os << arg << " ";
+    }
+    return os;
+}
