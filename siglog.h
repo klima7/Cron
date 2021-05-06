@@ -11,14 +11,14 @@ namespace siglog {
     typedef void (*DUMP_FUNCTION)(FILE *file);
 
     // Lifecycle functions
-    int init(int level_sig, int dump_sig, LEVEL level, char *dir_path);
+    int init(int level_sig, int dump_sig, LEVEL level, const char *dir_path);
     void free();
 
     // Logging functions
     void log(LEVEL level, char *fmt, ...);
-    void min(char *fmt, ...);
-    void standard(char *fmt, ...);
-    void max(char *fmt, ...);
+    void min(const char *fmt, ...);
+    void standard(const char *fmt, ...);
+    void max(const char *fmt, ...);
 
     // Dumping functions
     int register_dump_function(DUMP_FUNCTION fun);

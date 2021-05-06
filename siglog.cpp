@@ -23,7 +23,7 @@ namespace siglog {
 
 // Global variables
     static int initialized;
-    static char *logging_directory;
+    static const char *logging_directory;
     static LEVEL current_logging_level;
     static int level_signal, dump_signal;
     static pthread_t level_tid, dump_tid;
@@ -51,7 +51,7 @@ namespace siglog {
 
     static string str_level(LEVEL lvl);
 
-    static void vlog(LEVEL level, char *fmt, va_list vargs);
+    static void vlog(LEVEL level, const char *fmt, va_list vargs);
 
 // Variables to synchronize level signal handling
     static sem_t sem_level;
@@ -151,7 +151,7 @@ namespace siglog {
  * level - initial logging level
  * path - path to existing directory where log and dump files should appear. NULL if current directory
  */
-    int init(int level_sig, int dump_sig, LEVEL level, char *path) {
+    int init(int level_sig, int dump_sig, LEVEL level, const char *path) {
 
         // Local variables
         sigset_t set;
@@ -336,7 +336,7 @@ namespace siglog {
     }
 
 // Auxiliary logging function accepting va_list
-    static void vlog(LEVEL level, char *fmt, va_list vargs) {
+    static void vlog(LEVEL level, const char *fmt, va_list vargs) {
         if (!initialized || level == DISABLED) return;
 
         if (level <= current_logging_level) {
@@ -365,7 +365,7 @@ namespace siglog {
  * level - loggin level
  * fmt, ... - arguments similar to printf
  */
-    void log(LEVEL level, char *fmt, ...) {
+    void log(LEVEL level, const char *fmt, ...) {
         va_list valist;
         va_start(valist, fmt);
         vlog(level, fmt, valist);
@@ -376,7 +376,7 @@ namespace siglog {
  * Function to add log entry with maximum priority
  * fmt, ... - arguments similar to printf
  */
-    void max(char *fmt, ...) {
+    void max(const char *fmt, ...) {
         va_list valist;
         va_start(valist, fmt);
         vlog(MAX, fmt, valist);
@@ -387,7 +387,7 @@ namespace siglog {
  * Function to add log entry with standard priority
  * fmt, ... - arguments similar to printf
  */
-    void standard(char *fmt, ...) {
+    void standard(const char *fmt, ...) {
         va_list valist;
         va_start(valist, fmt);
         vlog(STANDARD, fmt, valist);
@@ -398,7 +398,7 @@ namespace siglog {
  * Function to add log entry with minimum priority
  * fmt, ... - arguments similar to printf
  */
-    void min(char *fmt, ...) {
+    void min(const char *fmt, ...) {
         va_list valist;
         va_start(valist, fmt);
         vlog(MIN, fmt, valist);
