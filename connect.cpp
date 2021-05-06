@@ -57,7 +57,7 @@ static void start_logging() {
     if (stat(path, &st) == -1)
         mkdir(path, 0700);
 
-    siglog::init(SIGRTMIN, SIGRTMIN+1, siglog::STANDARD, path);
+    siglog::init(SIGRTMIN, SIGRTMIN+1, siglog::MIN, path);
 }
 
 void Server::start_server() {

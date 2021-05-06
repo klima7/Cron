@@ -1,5 +1,6 @@
 #include "cron.h"
 #include "task.h"
+#include "siglog.h"
 #include <list>
 #include <vector>
 
@@ -10,6 +11,7 @@ void Cron::add_task(string path, vector<string> args, Time base_time, Time repea
     try {
         task->schedule();
         tasks.push_back(task);
+        siglog::standard("New task added with id %d", task->get_id());
     } catch(runtime_error&) {
         delete task;
         throw;
@@ -20,17 +22,21 @@ void Cron::remove_task(int task_id) {
     for(auto task : tasks) {
         if(task->is_active() && task->get_id() == task_id) {
             task->cancel();
+            siglog::standard("Task with id %d removed", task_id);
             return;
         }
     }
+    siglog::max("Unable to find task with id %d", task_id);
     throw runtime_error("Unable to find task with given id");
 }
 
 std::list<Task> Cron::get_tasks() const {
+    siglog::standard("Cron is listing tasks");
     list<Task> active_tasks;
     for(Task *task : tasks) {
-        if(task->is_active())
+        if(task->is_active()) {
             active_tasks.push_back(*task);
+        }
     }
     return active_tasks;
 }
@@ -46,6 +52,7 @@ int Cron::exit() {
     }
     tasks.clear();
     exited = true;
+    siglog::max("Cron exited");
     return count;
 }
 

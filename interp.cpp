@@ -1,5 +1,6 @@
 #include "interp.h"
 #include "time.h"
+#include "siglog.h"
 #include "util.h"
 #include <vector>
 #include <sstream>
@@ -34,11 +35,13 @@ string Interpreter::interpret(std::string command) {
         return stream.str();
     }
     else {
-        return "Invalid command";
+        siglog::standard("Invalid command received: %s", tokens[0].c_str());
+        return "Invalid command\n";
     }
 }
 
 void Interpreter::add_command(vector<string> arguments, stringstream &out) {
+    siglog::standard("Add command received");
     try {
         auto iter = arguments.begin();
 
@@ -49,6 +52,7 @@ void Interpreter::add_command(vector<string> arguments, stringstream &out) {
 
         // Check if relative
         if (*iter == "-r") {
+            siglog::min("Task to add is relative");
             relative = true;
             iter++;
         }
@@ -65,6 +69,7 @@ void Interpreter::add_command(vector<string> arguments, stringstream &out) {
         // Get repeat time if present
         Time repeat_time;
         if (*iter == "-c") {
+            siglog::min("Task to add is cyclic");
             iter++;
             if(iter == arguments.end())
                 throw ArgumentsException();
@@ -92,6 +97,7 @@ void Interpreter::add_command(vector<string> arguments, stringstream &out) {
 }
 
 void Interpreter::remove_command(vector<string> arguments, stringstream &out) {
+    siglog::standard("Remove command received");
     try {
         if(arguments.size() != 1)
             throw ArgumentsException();
@@ -101,6 +107,7 @@ void Interpreter::remove_command(vector<string> arguments, stringstream &out) {
             id = stoi(arguments[0]);
         }
         catch(invalid_argument&) {
+            siglog::min("Task id to remove is invalid: %s", arguments[0].c_str());
             out << "Error: Provided id is not a number" << endl;
             return;
         }
@@ -109,8 +116,8 @@ void Interpreter::remove_command(vector<string> arguments, stringstream &out) {
         out << "Task with id " << id << " removed" << endl;
     }
     catch(ArgumentsException &e) {
-        out << "Invalid arguments" << endl;
-        out << "Proper usage: cron rm <id>" << endl;
+        siglog::min("Remove command have invalid arguments");
+        out << "Invalid arguments" << endl << "Proper usage: cron rm <id>" << endl;
     }
     catch(runtime_error& e) {
         out << "Error: " << e.what() << endl;
@@ -118,6 +125,7 @@ void Interpreter::remove_command(vector<string> arguments, stringstream &out) {
 }
 
 void Interpreter::list_command(stringstream &out) {
+    siglog::standard("List command received");
     list<Task> tasks = cron.get_tasks();
 
     if(tasks.size() == 0) {
@@ -131,6 +139,7 @@ void Interpreter::list_command(stringstream &out) {
 }
 
 void Interpreter::exit_command(stringstream &out) {
+    siglog::standard("Exit command received");
     int count = cron.exit();
     out << "Cron exited. " << count << " tasks canceled" << endl;
 }
