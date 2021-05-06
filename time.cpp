@@ -52,7 +52,7 @@ long Time::get_relative_seconds() const {
 }
 
 long Time::get_absolute_seconds() const {
-    time_t t1 = time(NULL);
+    time_t t1 = time(nullptr);
     struct tm *t2 = localtime(&t1);
     int daylight_saving = t2->tm_isdst;
 

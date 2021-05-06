@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Cron* Cron::dump_cron = NULL;
+Cron* Cron::dump_cron = nullptr;
 
 void Cron::add_task(string path, vector<string> args, Time base_time, Time repeat_time) {
     Task *task = new Task(path, args, base_time, repeat_time);

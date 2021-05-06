@@ -48,8 +48,8 @@ void Task::run() {
     char* arg_list[args.size()+1];
     for(int i=0; i<args.size(); i++)
         arg_list[i] = (char*)args[i].c_str();
-    arg_list[args.size()] = NULL;
-    posix_spawn(&child_pid, command.c_str(), NULL, NULL, arg_list, NULL);
+    arg_list[args.size()] = nullptr;
+    posix_spawn(&child_pid, command.c_str(), nullptr, nullptr, arg_list, nullptr);
 }
 
 void Task::cancel() {
@@ -83,7 +83,7 @@ void Task::schedule() {
     // Validate absolute time
     else {
         seconds = base_time.get_absolute_seconds();
-        long curr_seconds = time(NULL);
+        long curr_seconds = time(nullptr);
         if(curr_seconds > seconds) {
             throw runtime_error("Provided absolute time already elapsed");
         }
@@ -95,7 +95,7 @@ void Task::schedule() {
     timespec.it_value.tv_sec = seconds;
 
     // Start timer
-    res = timer_settime(timer, base_time.is_relative() ? 0 : TIMER_ABSTIME, &timespec, NULL);
+    res = timer_settime(timer, base_time.is_relative() ? 0 : TIMER_ABSTIME, &timespec, nullptr);
     if(res != 0)
         throw runtime_error("Unable to start timer");
 }

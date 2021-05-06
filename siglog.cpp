@@ -70,25 +70,20 @@ namespace siglog {
         sigset_t set;
         sigemptyset(&set);
         sigaddset(&set, level_signal);
-        pthread_sigmask(SIG_UNBLOCK, &set, NULL);
+        pthread_sigmask(SIG_UNBLOCK, &set, nullptr);
 
         // Wait for level change signal and handle it
         while (1) {
-            printf("Hello 0");
             sem_wait(&sem_level);
-            printf("Hello 1");
 
             if (level_signal_val == -1)
                 continue;
-            printf("Hello 2");
 
             if (level_signal_val >= DISABLED && level_signal_val <= MIN) {
-                printf("Hello 3");
                 pthread_mutex_lock(&log_mutex);
                 current_logging_level = (LEVEL) level_signal_val;
                 pthread_mutex_unlock(&log_mutex);
             }
-            printf("Hello 4");
 
             level_signal_val = -1;
         }
@@ -108,7 +103,7 @@ namespace siglog {
         sigset_t set;
         sigemptyset(&set);
         sigaddset(&set, dump_signal);
-        pthread_sigmask(SIG_UNBLOCK, &set, NULL);
+        pthread_sigmask(SIG_UNBLOCK, &set, nullptr);
 
         // Wait for dump signal and handle it
         while (1) {
@@ -125,7 +120,7 @@ namespace siglog {
         char time_buffer[40];
 
         // Get date
-        time_t time_raw = time(NULL);
+        time_t time_raw = time(nullptr);
         struct tm *time_info = localtime(&time_raw);
         strftime(time_buffer, 40, "%m.%d.%y-%H:%M:%S", time_info);
 
@@ -135,12 +130,12 @@ namespace siglog {
 
         // Construct path
         char path[100];
-        if (logging_directory != NULL) sprintf(path, "%s/%s", logging_directory, filename);
+        if (logging_directory != nullptr) sprintf(path, "%s/%s", logging_directory, filename);
         else sprintf(path, "%s", filename);
 
         // Open file
         FILE *file = fopen(path, "w");
-        assert(file != NULL);
+        assert(file != nullptr);
 
         // Write header line to dump file
         fprintf(file, "%s\n", filename);
@@ -156,7 +151,7 @@ namespace siglog {
  * level_sig - signal number to change logging level or disable logging
  * dump_sig - signal number to perform dump operation
  * level - initial logging level
- * path - path to existing directory where log and dump files should appear. NULL if current directory
+ * path - path to existing directory where log and dump files should appear. nullptr if current directory
  */
     int init(int level_sig, int dump_sig, LEVEL level, const char *path) {
 
@@ -178,10 +173,10 @@ namespace siglog {
 
         // Open file
         char filename[100] = {};
-        if (path != NULL) sprintf(filename, "%s/%s", path, "logs");
+        if (path != nullptr) sprintf(filename, "%s/%s", path, "logs");
         else sprintf(filename, "logs");
         log_file = fopen(filename, "a+");
-        if (log_file == NULL) return -1;
+        if (log_file == nullptr) return -1;
 
         // Init semaphors
         err = sem_init(&sem_dump, 0, 0);
@@ -198,7 +193,7 @@ namespace siglog {
         }
 
         // Init mutexes
-        err = pthread_mutex_init(&log_mutex, NULL);
+        err = pthread_mutex_init(&log_mutex, nullptr);
         if (err != 0) {
             sem_destroy(&sem_dump);
             sem_destroy(&sem_level);
@@ -206,7 +201,7 @@ namespace siglog {
             return -1;
         }
 
-        err = pthread_mutex_init(&dump_mutex, NULL);
+        err = pthread_mutex_init(&dump_mutex, nullptr);
         if (err != 0) {
             sem_destroy(&sem_dump);
             sem_destroy(&sem_level);
@@ -220,7 +215,7 @@ namespace siglog {
         act.sa_sigaction = level_handler;
         act.sa_mask = set;
         act.sa_flags = SA_SIGINFO;
-        err = sigaction(level_sig, &act, NULL);
+        err = sigaction(level_sig, &act, nullptr);
         if (err != 0) {
             sem_destroy(&sem_dump);
             sem_destroy(&sem_level);
@@ -234,7 +229,7 @@ namespace siglog {
         sigfillset(&set);
         act.sa_sigaction = dump_handler;
         act.sa_mask = set;
-        err = sigaction(dump_sig, &act, NULL);
+        err = sigaction(dump_sig, &act, nullptr);
         if (err != 0) {
             sem_destroy(&sem_dump);
             sem_destroy(&sem_level);
@@ -245,7 +240,7 @@ namespace siglog {
         }
 
         // Create first thread
-        err = pthread_create(&level_tid, NULL, level_thread, NULL);
+        err = pthread_create(&level_tid, nullptr, level_thread, nullptr);
         if (err != 0) {
             sem_destroy(&sem_dump);
             sem_destroy(&sem_level);
@@ -256,7 +251,7 @@ namespace siglog {
         }
 
         // Create second thread
-        err = pthread_create(&dump_tid, NULL, dump_thread, NULL);
+        err = pthread_create(&dump_tid, nullptr, dump_thread, nullptr);
         if (err != 0) {
             pthread_cancel(level_tid);
             sem_destroy(&sem_dump);
@@ -295,7 +290,7 @@ namespace siglog {
 
         // Alloc array of pointers to dump functions
         dump_functions = (DUMP_FUNCTION *) calloc(sizeof(DUMP_FUNCTION), dump_functions_capacity);
-        if (dump_functions == NULL) {
+        if (dump_functions == nullptr) {
             pthread_cancel(level_tid);
             pthread_cancel(dump_tid);
             sem_destroy(&sem_dump);
@@ -318,8 +313,8 @@ namespace siglog {
 
         pthread_cancel(level_tid);
         pthread_cancel(dump_tid);
-        pthread_join(level_tid, NULL);
-        pthread_join(dump_tid, NULL);
+        pthread_join(level_tid, nullptr);
+        pthread_join(dump_tid, nullptr);
         sem_destroy(&sem_dump);
         sem_destroy(&sem_level);
         pthread_mutex_destroy(&log_mutex);
@@ -349,7 +344,7 @@ namespace siglog {
         if (level <= current_logging_level) {
 
             // Get date
-            time_t time_raw = time(NULL);
+            time_t time_raw = time(nullptr);
             struct tm *time_info = localtime(&time_raw);
             char time_buffer[50];
             strftime(time_buffer, 50, DATE_FORMAT, time_info);
@@ -430,7 +425,7 @@ namespace siglog {
         if (dump_functions_size >= dump_functions_capacity) {
             DUMP_FUNCTION *new_dump_functions = (DUMP_FUNCTION *) realloc(dump_functions, sizeof(DUMP_FUNCTION) *
                                                                                           dump_functions_capacity * 2);
-            if (new_dump_functions == NULL) return -1;
+            if (new_dump_functions == nullptr) return -1;
             dump_functions = new_dump_functions;
             dump_functions_capacity = dump_functions_capacity * 2;
         }

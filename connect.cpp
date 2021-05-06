@@ -25,7 +25,6 @@ int main(int argc, char **argv) {
         }
         catch(runtime_error& e) {
             cout << "Error occurred. Cron is probably already running. Check logs" << endl;
-            cout << e.what() << endl;
             siglog::max((string("Error: ") + e.what()).c_str());
             return EXIT_FAILURE;
         }
@@ -59,7 +58,6 @@ static void start_logging() {
         mkdir(path, 0700);
 
     siglog::init(SIGRTMIN, SIGRTMIN+1, siglog::MIN, path);
-    cout << SIGRTMIN << endl;
 }
 
 void Server::start_server() {
