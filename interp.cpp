@@ -3,6 +3,7 @@
 #include "siglog.h"
 #include "util.h"
 #include <vector>
+#include <iomanip>
 #include <sstream>
 
 using namespace std;
@@ -34,9 +35,13 @@ string Interpreter::interpret(std::string command) {
         list_command(stream);
         return stream.str();
     }
+    else if(tokens[0] == "help") {
+        help_command(stream);
+        return stream.str();
+    }
     else {
         siglog::standard("Invalid command received: %s", tokens[0].c_str());
-        return "Invalid command\n";
+        return "Invalid command. Enter cron help to get help\n";
     }
 }
 
@@ -142,4 +147,13 @@ void Interpreter::exit_command(stringstream &out) {
     siglog::standard("Exit command received");
     int count = cron.exit();
     out << "Cron exited. " << count << " tasks canceled" << endl;
+}
+
+void Interpreter::help_command(std::stringstream &out) {
+    out << left << setw(70) << "cron " << " Start cron" << endl;
+    out << left << setw(70) << "cron exit " << " Exit cron and cancel all tasks" << endl;
+    out << left << setw(70) << "cron add [-r] <s.m.h.d.m.y> [-c s.m.h.d.m.y] path [arguments...] " << " Schedule new task" << endl;
+    out << left << setw(70) << "cron rm <id> " << " Cancel task with given id" << endl;
+    out << left << setw(70) << "cron list " << " List scheduled tasks" << endl;
+    out << left << setw(70) << "cron help " << " Show this message" << endl;
 }
