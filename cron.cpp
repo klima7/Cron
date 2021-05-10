@@ -65,6 +65,7 @@ bool Cron::is_exited() const {
 }
 
 void Cron::dump(FILE *file) {
+    siglog::standard("cron is performing dump");
     stringstream ss;
     std::list<Task> tasks = dump_cron->get_tasks();
     for(Task task : tasks)

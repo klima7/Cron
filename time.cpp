@@ -7,18 +7,21 @@
 using namespace std;
 
 Time::Time(bool relative, string str_time) {
-    int numbers[6];
+    cout << "Here 0" << endl;
+    int numbers[6] = {0};
     
     vector<string> tokens = tokenize(str_time, ".");
-    if(tokens.size() != 6)
+    if(tokens.size() > 6)
         throw runtime_error("Invalid parts if time expression");
 
     int index = 0;
     for(string token : tokens) {
-        if(token.length() == 0)
-            throw runtime_error("Invalid characters is time expression");
         size_t read_chars;
-        numbers[index] = stoi(token, &read_chars);
+        try {
+            numbers[index] = stoi(token, &read_chars);
+        } catch(invalid_argument&) {
+            throw runtime_error("Invalid number is time expression");
+        }
         if(read_chars != token.length())
             throw runtime_error("Invalid number is time expression");
         index++;
