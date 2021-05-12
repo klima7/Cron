@@ -35,7 +35,7 @@ void Cron::remove_task(int task_id) {
 }
 
 std::list<Task> Cron::get_tasks() const {
-    siglog::standard("Cron is listing tasks");
+    siglog::min("Cron is listing tasks");
     list<Task> active_tasks;
     for(Task *task : tasks) {
         if(task->is_active()) {

@@ -43,13 +43,16 @@ bool Task::is_active() const {
 }
 
 void Task::run() {
-    siglog::min("Task with id %d running", id);
+    siglog::standard("Starting task %d", id);
     pid_t child_pid;
     char* arg_list[args.size()+1];
     for(int i=0; i<args.size(); i++)
         arg_list[i] = (char*)args[i].c_str();
     arg_list[args.size()] = nullptr;
-    posix_spawn(&child_pid, command.c_str(), nullptr, nullptr, arg_list, nullptr);
+    int res = posix_spawn(&child_pid, command.c_str(), nullptr, nullptr, arg_list, nullptr);
+    if(res != 0) {
+        siglog::max("Error occurred while starting task %d", id);
+    }
 }
 
 void Task::cancel() {

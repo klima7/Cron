@@ -7,7 +7,6 @@
 using namespace std;
 
 Time::Time(bool relative, string str_time) {
-    cout << "Here 0" << endl;
     int numbers[6] = {0};
     
     vector<string> tokens = tokenize(str_time, ".");
